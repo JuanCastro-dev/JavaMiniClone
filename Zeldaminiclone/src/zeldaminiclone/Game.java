@@ -2,9 +2,11 @@ package zeldaminiclone;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyListener;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
 
-public class Game extends Canvas implements Runnable {
+public class Game extends Canvas implements Runnable, KeyListener {
 
     private JFrame frame;
     public static final int  WIDTH = 240;
@@ -14,11 +16,17 @@ public class Game extends Canvas implements Runnable {
     private Thread thread;
     private boolean isRunning = true;
 
+    private Player player;
+
     public Game(){
+        thread = new Thread(this);
+        player = new Player(32,32);
+
         setPreferredSize(new Dimension(WIDTH*SCALE, HEIGHT*SCALE));
         initFrame();
+        this.addKeyListener(this);
 
-        start();
+        thread.start();
     }
 
     public void initFrame(){
@@ -42,7 +50,7 @@ public class Game extends Canvas implements Runnable {
 
     //Lógica de atualização das ações
     public void tick(){
-
+        player.tick();
     }
 
     public void render(){
@@ -52,13 +60,19 @@ public class Game extends Canvas implements Runnable {
             return;
         }
 
+        //Pinta o quadro
         Graphics g = bs.getDrawGraphics();
         g.setColor(Color.BLACK);
         g.fillRect(0,0,WIDTH*SCALE,HEIGHT*SCALE);
+
+        //Pinta o player
+        player.render(g);
+
         g.dispose();
         bs.show();
     }
 
+    //Jogo em execução
     @Override
     public void run() {
         while (isRunning){
@@ -71,5 +85,40 @@ public class Game extends Canvas implements Runnable {
             }
         }
         stop();
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {}
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT){
+            player.right = true;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_LEFT){
+            player.left = true;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_UP){
+            player.up = true;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_DOWN){
+            player.down = true;
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT){
+            player.right = false;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_LEFT){
+            player.left = false;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_UP){
+            player.up = false;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_DOWN){
+            player.down = false;
+        }
     }
 }
