@@ -16,11 +16,13 @@ public class Game extends Canvas implements Runnable, KeyListener {
     private Thread thread;
     private boolean isRunning = true;
 
-    private Player player;
+    static Player player;
+    static World world;
 
     public Game(){
         thread = new Thread(this);
-        player = new Player(32,32);
+        player = new Player(0,0);
+        world = new World("map.png");
 
         setPreferredSize(new Dimension(WIDTH*SCALE, HEIGHT*SCALE));
         initFrame();
@@ -65,6 +67,8 @@ public class Game extends Canvas implements Runnable, KeyListener {
         g.setColor(Color.BLACK);
         g.fillRect(0,0,WIDTH*SCALE,HEIGHT*SCALE);
 
+        //Pinta o mapa
+        world.render(g);
         //Pinta o player
         player.render(g);
 
