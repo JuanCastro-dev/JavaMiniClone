@@ -15,12 +15,17 @@ public class Player {
         this.y = y;
     }
 
-    public void tick(){
-        if(right) x += speed;
-        else if (left) x -= speed;
-
-        if (up) y -= speed;
-        else if (down) y+= speed;
+    public void tick() {
+        if (right && World.isFree(x + speed, y)) {
+            x += speed;
+        } else if (left && World.isFree(x - speed, y)) {
+            x -= speed;
+        }
+        if (up && World.isFree(x, y - speed)) {
+            y -= speed;
+        } else if (down && World.isFree(x, y + speed)) {
+            y += speed;
+        }
     }
 
     public void render(Graphics g) {
