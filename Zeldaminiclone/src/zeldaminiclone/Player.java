@@ -1,6 +1,7 @@
 package zeldaminiclone;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 //Atributos e métodos do player
 public class Player {
@@ -10,9 +11,13 @@ public class Player {
 
     public boolean right, left, up, down;
 
+    private BufferedImage sprite;
+
     public Player(int x, int y){
         this.x = x;
         this.y = y;
+        SpriteSheet sheet = new SpriteSheet("resources/spritesheet.png");
+        sprite = sheet.getSprite(0, 0, 16, 16);
     }
 
     public void tick() {
@@ -29,7 +34,6 @@ public class Player {
     }
 
     public void render(Graphics g) {
-        g.setColor(Color.BLUE);
-        g.fillRect(x, y, 16, 16);
+        g.drawImage(sprite, x, y, null);
     }
 }
