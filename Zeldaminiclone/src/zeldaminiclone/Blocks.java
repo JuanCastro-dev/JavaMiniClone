@@ -1,7 +1,10 @@
 package zeldaminiclone;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 //Classe que representa os blocos do cenário
 public class Blocks extends Rectangle {
@@ -13,8 +16,12 @@ public class Blocks extends Rectangle {
     private BufferedImage texture;
 
     public Blocks(){
-        SpriteSheet sheet = new SpriteSheet("resources/spritesheet.png");
-        texture = sheet.getSprite(16, 0, 16, 16); // segundo sprite da primeira linha
+        try{
+            texture = ImageIO.read(new File("resources/player/player_front.png"));
+        } catch (IOException e) {
+            System.err.println("Erro ao carregar a imagem do jogador");
+            throw new RuntimeException(e);
+        }
     }
 
     public void render(Graphics g) {

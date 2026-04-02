@@ -1,7 +1,9 @@
 package zeldaminiclone;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 //Atributos e métodos do player
 public class Player {
@@ -13,11 +15,21 @@ public class Player {
 
     private BufferedImage sprite;
 
-    public Player(int x, int y){
+    public Player(int x, int y) {
         this.x = x;
         this.y = y;
-        SpriteSheet sheet = new SpriteSheet("resources/spritesheet.png");
-        sprite = sheet.getSprite(0, 0, 16, 16);
+
+        try {
+            // Carrega a imagem diretamente.
+            // Verifique se o caminho está correto (corrigi 'palyer' para 'player')
+            sprite = ImageIO.read(getClass().getResourceAsStream("/player/player_front.png"));
+
+        } catch (IOException e) {
+            System.err.println("Erro ao carregar a imagem do Player!");
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            System.err.println("Arquivo não encontrado! Verifique o caminho e se a pasta está marcada como 'Resources Root'");
+        }
     }
 
     public void tick() {
