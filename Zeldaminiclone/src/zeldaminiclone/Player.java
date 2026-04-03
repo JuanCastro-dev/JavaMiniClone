@@ -34,7 +34,7 @@ public class Player {
 
     public void tick() {
         if (right && World.isFree(x + speed, y)) {
-            x += speed;
+            x += speed;\
         } else if (left && World.isFree(x - speed, y)) {
             x -= speed;
         }
