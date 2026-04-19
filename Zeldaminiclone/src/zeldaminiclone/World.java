@@ -11,15 +11,16 @@ import java.util.ArrayList;
 public class World {
 
     public static ArrayList<Blocks> blocks = new ArrayList<>();
+    public static int WIDTH, HEIGHT;
 
     public World(String path) {
         try {
             BufferedImage map = ImageIO.read(new File(path));
-            int width = map.getWidth();
-            int height = map.getHeight();
+            WIDTH = map.getWidth();
+            HEIGHT = map.getHeight();
 
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
+            for (int x = 0; x < WIDTH; x++) {
+                for (int y = 0; y < HEIGHT; y++) {
                     int pixelColor = map.getRGB(x, y);
 
                     int red = (pixelColor >> 16) & 0xff;

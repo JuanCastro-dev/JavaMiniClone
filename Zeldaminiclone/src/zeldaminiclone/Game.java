@@ -24,6 +24,9 @@ public class Game extends Canvas implements Runnable, KeyListener {
         player = new Player(0,0);
         world = new World("resources/map.png");
 
+        Camera.x = 0;
+        Camera.y = 0;
+
         setPreferredSize(new Dimension(WIDTH*SCALE, HEIGHT*SCALE));
         initFrame();
         this.addKeyListener(this);

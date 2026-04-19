@@ -25,6 +25,6 @@ public class Blocks extends Rectangle {
     }
 
     public void render(Graphics g) {
-        g.drawImage(texture, x, y, null);
+        g.drawImage(texture, x - Camera.x, y - Camera.y, null);
     }
 }

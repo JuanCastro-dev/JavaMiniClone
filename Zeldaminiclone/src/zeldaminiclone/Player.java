@@ -43,9 +43,14 @@ public class Player {
         } else if (down && World.isFree(x, y + speed)) {
             y += speed;
         }
+
+        Camera.x = Camera.clamp(x - (Game.WIDTH / 2), 0, (World.WIDTH * 16) -
+                Game.WIDTH);
+        Camera.y = Camera.clamp(y - (Game.HEIGHT / 2), 0, (World.HEIGHT * 16) -
+                Game.HEIGHT);
     }
 
     public void render(Graphics g) {
-        g.drawImage(sprite, x, y, null);
+        g.drawImage(sprite, x - Camera.x, y - Camera.y, null);
     }
 }
