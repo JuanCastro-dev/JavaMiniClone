@@ -66,9 +66,11 @@ public class Game extends Canvas implements Runnable, KeyListener {
         }
 
         //Pinta o quadro
-        Graphics g = bs.getDrawGraphics();
+        Graphics2D g = (Graphics2D) bs.getDrawGraphics();
         g.setColor(Color.BLACK);
         g.fillRect(0,0,WIDTH*SCALE,HEIGHT*SCALE);
+
+        g.scale(SCALE,SCALE);
 
         //Pinta o mapa
         world.render(g);
