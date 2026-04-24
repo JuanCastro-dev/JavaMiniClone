@@ -13,24 +13,37 @@ public class Player {
 
     public boolean right, left, up, down;
 
-    private BufferedImage[] sprites = new BufferedImage[6];
+    private BufferedImage[] spritesFront = new BufferedImage[2];
+    private BufferedImage[] spritesBack = new BufferedImage[2];
+    private BufferedImage[] spritesRight = new BufferedImage[2];
+    private BufferedImage[] spritesLeft = new BufferedImage[2];
+
+    //Vetor que determina a posição atual
+    private BufferedImage[] curDirection = new BufferedImage[2];
+
     private int curAnimation = 0;
     private int frames = 0;
     private int maxFrames = 10;
-    private int maxAnimation = 3;
+    private int maxAnimation = 2;
 
     public Player(int x, int y) {
         this.x = x;
         this.y = y;
+        curDirection = spritesFront;
 
         try {
             // Carrega a imagem diretamente.
-            sprites[0] = ImageIO.read(getClass().getResourceAsStream("/player/player_front.png"));
-            sprites[1] = ImageIO.read(getClass().getResourceAsStream("/player/player_back.png"));
-            sprites[2] = ImageIO.read(getClass().getResourceAsStream("/player/player_right.png"));
-            sprites[3] = ImageIO.read(getClass().getResourceAsStream("/player/player_right2.png"));
-            sprites[4] = ImageIO.read(getClass().getResourceAsStream("/player/player_left.png"));
-            sprites[5] = ImageIO.read(getClass().getResourceAsStream("/player/player_left2.png"));
+            spritesFront[0] = ImageIO.read(getClass().getResourceAsStream("/player/player_front.png"));
+            spritesFront[1] = ImageIO.read(getClass().getResourceAsStream("/player/player_front2.png"));
+
+            spritesBack[0] = ImageIO.read(getClass().getResourceAsStream("/player/player_back.png"));
+            spritesBack[1] = ImageIO.read(getClass().getResourceAsStream("/player/player_back2.png"));
+
+            spritesRight[0] = ImageIO.read(getClass().getResourceAsStream("/player/player_right.png"));
+            spritesRight[1] = ImageIO.read(getClass().getResourceAsStream("/player/player_right2.png"));
+
+            spritesLeft[0] = ImageIO.read(getClass().getResourceAsStream("/player/player_left.png"));
+            spritesLeft[1] = ImageIO.read(getClass().getResourceAsStream("/player/player_left2.png"));
 
 
         } catch (IOException e) {
@@ -43,33 +56,37 @@ public class Player {
 
     public void tick() {
 
-        boolean moved = false;
+        boolean movedDown = false;
+        boolean movedUp = false;
+        boolean movedRight = false;
+        boolean movedLeft = false;
 
         if (right && World.isFree(x + speed, y)) {
             x += speed;
-            moved = true;
+            movedRight = true;
         } else if (left && World.isFree(x - speed, y)) {
             x -= speed;
-            moved = true;
+            movedLeft = true;
         }
         if (up && World.isFree(x, y - speed)) {
             y -= speed;
-            moved = true;
+            movedUp = true;
         } else if (down && World.isFree(x, y + speed)) {
             y += speed;
-            moved = true;
+            movedDown = true;
         }
 
-        //Lógica do movimento
-        if(moved){
-            frames++;
-            if(frames >= maxFrames){
-                frames = 0;
-                curAnimation++;
-                if(curAnimation >= maxAnimation){
-                    curAnimation = 0;
-                }
-            }
+        if (movedRight){
+            movePlayerAnimation(spritesRight);
+        }
+        if(movedLeft){
+            movePlayerAnimation(spritesLeft);
+        }
+        if (movedUp){
+            movePlayerAnimation(spritesBack);
+        }
+        if(movedDown){
+            movePlayerAnimation(spritesFront);
         }
 
         Camera.x = Camera.clamp(x - (Game.WIDTH / 2), 0, (World.WIDTH * 16) -
@@ -79,6 +96,19 @@ public class Player {
     }
 
     public void render(Graphics g) {
-        g.drawImage(sprites[curAnimation], x - Camera.x, y - Camera.y, null);
+        g.drawImage(curDirection[curAnimation], x - Camera.x, y - Camera.y, null);
+    }
+
+    private void movePlayerAnimation(BufferedImage[] sprites){
+        frames++;
+        curDirection = sprites;
+
+        if(frames >= maxFrames){
+            frames = 0;
+            curAnimation++;
+            if(curAnimation >= maxAnimation){
+                curAnimation = 0;
+            }
+        }
     }
 }
