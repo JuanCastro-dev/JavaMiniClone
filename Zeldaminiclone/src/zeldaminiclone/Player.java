@@ -13,7 +13,11 @@ public class Player {
 
     public boolean right, left, up, down;
 
-    private BufferedImage sprite;
+    private BufferedImage[] sprites = new BufferedImage[6];
+    private int curAnimation = 0;
+    private int frames = 0;
+    private int maxFrames = 10;
+    private int maxAnimation = 3;
 
     public Player(int x, int y) {
         this.x = x;
@@ -21,8 +25,13 @@ public class Player {
 
         try {
             // Carrega a imagem diretamente.
-            // Verifique se o caminho está correto (corrigi 'palyer' para 'player')
-            sprite = ImageIO.read(getClass().getResourceAsStream("/player/player_front.png"));
+            sprites[0] = ImageIO.read(getClass().getResourceAsStream("/player/player_front.png"));
+            sprites[1] = ImageIO.read(getClass().getResourceAsStream("/player/player_back.png"));
+            sprites[2] = ImageIO.read(getClass().getResourceAsStream("/player/player_right.png"));
+            sprites[3] = ImageIO.read(getClass().getResourceAsStream("/player/player_right2.png"));
+            sprites[4] = ImageIO.read(getClass().getResourceAsStream("/player/player_left.png"));
+            sprites[5] = ImageIO.read(getClass().getResourceAsStream("/player/player_left2.png"));
+
 
         } catch (IOException e) {
             System.err.println("Erro ao carregar a imagem do Player!");
@@ -33,15 +42,34 @@ public class Player {
     }
 
     public void tick() {
+
+        boolean moved = false;
+
         if (right && World.isFree(x + speed, y)) {
             x += speed;
+            moved = true;
         } else if (left && World.isFree(x - speed, y)) {
             x -= speed;
+            moved = true;
         }
         if (up && World.isFree(x, y - speed)) {
             y -= speed;
+            moved = true;
         } else if (down && World.isFree(x, y + speed)) {
             y += speed;
+            moved = true;
+        }
+
+        //Lógica do movimento
+        if(moved){
+            frames++;
+            if(frames >= maxFrames){
+                frames = 0;
+                curAnimation++;
+                if(curAnimation >= maxAnimation){
+                    curAnimation = 0;
+                }
+            }
         }
 
         Camera.x = Camera.clamp(x - (Game.WIDTH / 2), 0, (World.WIDTH * 16) -
@@ -51,6 +79,6 @@ public class Player {
     }
 
     public void render(Graphics g) {
-        g.drawImage(sprite, x - Camera.x, y - Camera.y, null);
+        g.drawImage(sprites[curAnimation], x - Camera.x, y - Camera.y, null);
     }
 }
