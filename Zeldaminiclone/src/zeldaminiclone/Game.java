@@ -22,7 +22,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
     public Game(){
         thread = new Thread(this);
         player = new Player(0,0);
-        world = new World("resources/map.png");
+        world = new World("resources/map/map_1.png");
 
         Camera.x = 0;
         Camera.y = 0;

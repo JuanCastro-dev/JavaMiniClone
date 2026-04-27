@@ -46,6 +46,8 @@ public class World {
                     } else if (red == 255 && green == 0 && blue == 0) {
                         BufferedImage itemSprite = ImageIO.read(new File("resources/itens/full_heart.png"));
                         items.add(new Item(x * 16, y * 16, itemSprite));
+                    } else {
+                        System.out.println("Pixel desconhecido em (" + x + "," + y + "): R=" + red + " G=" + green + " B=" + blue);
                     }
                 }
             }
