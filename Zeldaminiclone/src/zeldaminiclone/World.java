@@ -11,7 +11,18 @@ import java.util.ArrayList;
 public class World {
 
     public static ArrayList<Blocks> blocks = new ArrayList<>();
+    public static ArrayList<Item> items = new ArrayList<>();
     public static int WIDTH, HEIGHT;
+
+    private static BufferedImage background;
+
+    static {
+        try {
+            background = ImageIO.read(new File("resources/map/map_grass.png"));
+        } catch (IOException e) {
+            throw new RuntimeException("Erro ao carregar background: resources/map/map_grass.png");
+        }
+    }
 
     public World(String path) {
         try {
@@ -32,6 +43,9 @@ public class World {
                     } else if (red == 0 && green == 0 && blue == 255) {
                         Game.player.x = x * 16;
                         Game.player.y = y * 16;
+                    } else if (red == 255 && green == 0 && blue == 0) {
+                        BufferedImage itemSprite = ImageIO.read(new File("resources/itens/full_heart.png"));
+                        items.add(new Item(x * 16, y * 16, itemSprite));
                     }
                 }
             }
@@ -41,8 +55,15 @@ public class World {
     }
 
     public void render(Graphics g) {
+        g.drawImage(background, -Camera.x, -Camera.y, WIDTH * 16, HEIGHT * 16, null);
         for (int i = 0; i < blocks.size(); i++) {
             blocks.get(i).render(g);
+        }
+    }
+
+    public void renderItens(Graphics g) {
+        for (Item item : items) {
+            item.render(g);
         }
     }
 

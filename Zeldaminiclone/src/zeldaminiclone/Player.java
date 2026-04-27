@@ -6,7 +6,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 //Atributos e métodos do player
-public class Player {
+public class Player extends Rectangle {
 
     public int x, y;
     public int speed = 2;
@@ -27,6 +27,7 @@ public class Player {
     private int maxAnimation = 2;
 
     public Player(int x, int y) {
+        super(x, y, 16, 16);
         this.x = x;
         this.y = y;
         curDirection = spritesFront;
@@ -93,6 +94,17 @@ public class Player {
                 Game.WIDTH);
         Camera.y = Camera.clamp(y - (Game.HEIGHT / 2), 0, (World.HEIGHT * 16) -
                 Game.HEIGHT);
+
+        this.setBounds(x, y, 16, 16);
+
+        for (int i = 0; i < World.items.size(); i++) {
+            Item item = World.items.get(i);
+            if (this.intersects(item)) {
+                World.items.remove(item);
+                i--;
+                break;
+            }
+        }
     }
 
     public void render(Graphics g) {

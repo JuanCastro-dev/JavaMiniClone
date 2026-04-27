@@ -74,6 +74,8 @@ public class Game extends Canvas implements Runnable, KeyListener {
 
         //Pinta o mapa
         world.render(g);
+        //Pinta os itens
+        world.renderItens(g);
         //Pinta o player
         player.render(g);
 
