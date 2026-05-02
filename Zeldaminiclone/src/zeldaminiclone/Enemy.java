@@ -17,10 +17,16 @@ public class Enemy extends Rectangle {
 
     private BufferedImage[] curDirection = new BufferedImage[2];
     private int curAnimation = 0;
+    private int frames = 0;
+    private int maxFrames = 10;
+    private int dirFrames = 0;
+    private int maxDirFrames = 60;
+    private int curDir = 0;
 
     public Enemy(int x, int y) {
         super(x, y, 16, 16);
         this.rand = new Random();
+        curDir = rand.nextInt(4);
         curDirection = spritesFront;
 
         try {
@@ -42,12 +48,37 @@ public class Enemy extends Rectangle {
         }
     }
 
-    public void tick(){
-        int dir = rand.nextInt(4); // 0 = direita, 1 = esquerda, 2 = cima, 3 = baixo
-        if (dir == 0 && World.isFree(x + speed, y)) x += speed;
-        else if (dir == 1 && World.isFree(x - speed, y)) x -= speed;
-        else if (dir == 2 && World.isFree(x, y - speed)) y -= speed;
-        else if (dir == 3 && World.isFree(x, y + speed)) y += speed;
+    public void tick() {
+        dirFrames++;
+        if (dirFrames >= maxDirFrames) {
+            dirFrames = 0;
+            curDir = rand.nextInt(4);
+        }
+
+        if (curDir == 0 && World.isFree(x + speed, y)) {
+            x += speed;
+            moveAnimation(spritesRight);
+        } else if (curDir == 1 && World.isFree(x - speed, y)) {
+            x -= speed;
+            moveAnimation(spritesLeft);
+        } else if (curDir == 2 && World.isFree(x, y - speed)) {
+            y -= speed;
+            moveAnimation(spritesBack);
+        } else if (curDir == 3 && World.isFree(x, y + speed)) {
+            y += speed;
+            moveAnimation(spritesFront);
+        }
+
+        this.setBounds(x, y, 16, 16);
+    }
+
+    private void moveAnimation(BufferedImage[] sprites) {
+        frames++;
+        curDirection = sprites;
+        if (frames >= maxFrames) {
+            frames = 0;
+            curAnimation = (curAnimation + 1) % 2;
+        }
     }
 
     public void render(Graphics g) {
