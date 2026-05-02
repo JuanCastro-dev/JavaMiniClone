@@ -56,6 +56,9 @@ public class Game extends Canvas implements Runnable, KeyListener {
     //Lógica de atualização das ações
     public void tick(){
         player.tick();
+        for (Enemy e : World.enemies) {
+            e.tick();
+        }
     }
 
     public void render(){
@@ -76,6 +79,10 @@ public class Game extends Canvas implements Runnable, KeyListener {
         world.render(g);
         //Pinta os itens
         world.renderItens(g);
+        //Pinta os inimigos
+        for (Enemy e : World.enemies) {
+            e.render(g);
+        }
         //Pinta o player
         player.render(g);
 

@@ -105,6 +105,12 @@ public class Player extends Rectangle {
                 break;
             }
         }
+
+        for (Enemy e : World.enemies) {
+            if (this.intersects(e)) {
+                System.out.println("Colidiu com o inimigo!"); // Aqui você poderia reduzir vida, reiniciar fase, etc.
+            }
+        }
     }
 
     public void render(Graphics g) {
