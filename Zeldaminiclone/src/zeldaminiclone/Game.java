@@ -160,7 +160,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
         g.setColor(Color.WHITE);
         Font font = new Font("arial", Font.BOLD, 6);
         g.setFont(font);
-        g.drawString("Itens: "+ player.itensColetados,10,25);
+        g.drawString("Itens coletados: "+ player.itensColetados,10,25);
     }
 
     public static void gameOver(){

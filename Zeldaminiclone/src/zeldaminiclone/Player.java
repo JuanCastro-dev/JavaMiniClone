@@ -105,6 +105,8 @@ public class Player extends Rectangle {
                 World.items.remove(item);
                 i--;
                 itensColetados++;
+                vida += 25;
+                if (vida > 50) vida = 50;
                 break;
             }
         }
