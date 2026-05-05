@@ -139,4 +139,9 @@ public class Game extends Canvas implements Runnable, KeyListener {
             player.down = false;
         }
     }
+
+    public static void gameOver(){
+        System.out.println("GAME OVER");
+        System.exit(0);
+    }
 }

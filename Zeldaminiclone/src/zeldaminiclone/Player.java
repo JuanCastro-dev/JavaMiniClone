@@ -10,6 +10,8 @@ public class Player extends Rectangle {
 
     public int x, y;
     public int speed = 2;
+    public int vida = 50;
+    public int itensColetados = 0;
 
     public boolean right, left, up, down;
 
@@ -102,13 +104,16 @@ public class Player extends Rectangle {
             if (this.intersects(item)) {
                 World.items.remove(item);
                 i--;
+                itensColetados++;
                 break;
             }
         }
 
         for (Enemy e : World.enemies) {
             if (this.intersects(e)) {
+                vida -= 1;
                 System.out.println("Colidiu com o inimigo!"); // Aqui você poderia reduzir vida, reiniciar fase, etc.
+                if (vida == 0) Game.gameOver();
             }
         }
     }
