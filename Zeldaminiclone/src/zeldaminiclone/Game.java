@@ -85,6 +85,8 @@ public class Game extends Canvas implements Runnable, KeyListener {
         }
         //Pinta o player
         player.render(g);
+        //Pinta o HUD
+        renderHUD(g);
 
         g.dispose();
         bs.show();
@@ -138,6 +140,27 @@ public class Game extends Canvas implements Runnable, KeyListener {
         if (e.getKeyCode() == KeyEvent.VK_DOWN){
             player.down = false;
         }
+    }
+
+    public void renderHUD(Graphics g){
+        //Barra de vida
+        g.setColor(Color.RED);
+        g.fillRect(10, 10, 100, 3);
+
+        //Vida atual
+        g.setColor(Color.GREEN);
+        int vidaAtual = player.vida * 100 / 50;
+        g.fillRect(10,10,vidaAtual,3);
+
+        //Borda da barra de vida
+        g.setColor(Color.WHITE);
+        g.drawRect(10, 10, 100, 3);
+
+        //Itens coletados
+        g.setColor(Color.WHITE);
+        Font font = new Font("arial", Font.BOLD, 6);
+        g.setFont(font);
+        g.drawString("Itens: "+ player.itensColetados,10,25);
     }
 
     public static void gameOver(){
