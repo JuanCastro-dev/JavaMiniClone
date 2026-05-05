@@ -148,8 +148,8 @@ public class Game extends Canvas implements Runnable, KeyListener {
         g.fillRect(10, 10, 100, 3);
 
         //Vida atual
-        g.setColor(Color.GREEN);
         int vidaAtual = player.vida * 100 / 50;
+        g.setColor(vidaAtual < 35 ? Color.ORANGE : Color.GREEN);
         g.fillRect(10,10,vidaAtual,3);
 
         //Borda da barra de vida
