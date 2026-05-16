@@ -20,16 +20,11 @@ public class World {
 
     private static BufferedImage background;
 
-    static {
-        try {
-            background = ImageIO.read(new File("resources/map/map_grass.png"));
-        } catch (IOException e) {
-            throw new RuntimeException("Erro ao carregar background: resources/map/map_grass.png");
-        }
-    }
-
     public World(String path) {
         try {
+            String bgPath = path.contains("map_2") ? "resources/map/dirt_floor.png" : "resources/map/map_grass.png";
+            background = ImageIO.read(new File(bgPath));
+
             BufferedImage map = ImageIO.read(new File(path));
             WIDTH = map.getWidth();
             HEIGHT = map.getHeight();
