@@ -19,6 +19,10 @@ public class Game extends Canvas implements Runnable, KeyListener {
     static Player player;
     static World world;
 
+    public static int currentLevel = 1;
+    public static final int maxLevel = 4;
+    public static boolean nearExit = false;
+
     public Game(){
         thread = new Thread(this);
         player = new Player(0,0);
@@ -124,6 +128,16 @@ public class Game extends Canvas implements Runnable, KeyListener {
         if (e.getKeyCode() == KeyEvent.VK_DOWN){
             player.down = true;
         }
+        if (e.getKeyCode() == KeyEvent.VK_E){
+            trocarFase();
+        }
+    }
+
+    public void trocarFase() {
+        if (!nearExit) return;
+        if (currentLevel >= maxLevel) return;
+        currentLevel++;
+        restartGame("resources/map/map_" + currentLevel + ".png");
     }
 
     @Override
@@ -166,5 +180,13 @@ public class Game extends Canvas implements Runnable, KeyListener {
     public static void gameOver(){
         System.out.println("GAME OVER");
         System.exit(0);
+    }
+
+    //Limpar elementos e gerar nova fase
+    public void restartGame(String levelPath) {
+        World.blocks.clear();
+        World.items.clear();
+        World.enemies.clear();
+        world = new World(levelPath);
     }
 }

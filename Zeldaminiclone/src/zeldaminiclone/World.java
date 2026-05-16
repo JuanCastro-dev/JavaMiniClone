@@ -55,7 +55,9 @@ public class World {
                     }
                     else if (red == 137 && green == 81 && blue == 41) {
                         dirtBlocks.add(new DirtBlock(x * 16, y * 16));
-                    }else {
+                    } else if (red == 255 && green == 255 && blue == 0) {
+                        Game.nearExit = true;
+                    } else {
                         System.out.println("Pixel desconhecido em (" + x + "," + y + "): R=" + red + " G=" + green + " B=" + blue);
                     }
                 }
@@ -70,6 +72,9 @@ public class World {
         for (int i = 0; i < blocks.size(); i++) {
             blocks.get(i).render(g);
         }
+        for (int i = 0; i < dirtBlocks.size(); i++) {
+            dirtBlocks.get(i).render(g);
+        }
     }
 
     public void renderItens(Graphics g) {
@@ -82,6 +87,12 @@ public class World {
         Rectangle futurePlayer = new Rectangle(xnext, ynext, 16, 16);
         for (int i = 0; i < blocks.size(); i++) {
             Blocks bloco = blocks.get(i);
+            if (futurePlayer.intersects(bloco)) {
+                return false;
+            }
+        }
+        for (int i = 0; i < dirtBlocks.size(); i++) {
+            DirtBlock bloco = dirtBlocks.get(i);
             if (futurePlayer.intersects(bloco)) {
                 return false;
             }
