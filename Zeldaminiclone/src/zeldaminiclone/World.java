@@ -47,9 +47,12 @@ public class World {
                     } else if (red == 255 && green == 0 && blue == 0) {
                         BufferedImage itemSprite = ImageIO.read(new File("resources/itens/full_heart.png"));
                         items.add(new Item(x * 16, y * 16, itemSprite));
-                    }else if (red == 0 && green == 255 && blue == 0) {
+                    }else if (red == 137 && green == 81 && blue == 41) {
                         enemies.add(new Enemy(x * 16, y * 16));
-                    } else {
+                    }
+                    else if (red == 0 && green == 255 && blue == 0) {
+                        System.out.println("Vapo");
+                    }else {
                         System.out.println("Pixel desconhecido em (" + x + "," + y + "): R=" + red + " G=" + green + " B=" + blue);
                     }
                 }
