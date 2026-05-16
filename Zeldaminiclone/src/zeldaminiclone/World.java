@@ -1,5 +1,7 @@
 package zeldaminiclone;
 
+import zeldaminiclone.blocks.DirtBlock;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -11,6 +13,7 @@ import java.util.ArrayList;
 public class World {
 
     public static ArrayList<Blocks> blocks = new ArrayList<>();
+    public static ArrayList<DirtBlock> dirtBlocks = new ArrayList<>();
     public static ArrayList<Item> items = new ArrayList<>();
     public static ArrayList<Enemy> enemies = new ArrayList<>();
     public static int WIDTH, HEIGHT;
@@ -45,13 +48,13 @@ public class World {
                         Game.player.x = x * 16;
                         Game.player.y = y * 16;
                     } else if (red == 255 && green == 0 && blue == 0) {
-                        BufferedImage itemSprite = ImageIO.read(new File("resources/itens/full_heart.png"));
-                        items.add(new Item(x * 16, y * 16, itemSprite));
-                    }else if (red == 137 && green == 81 && blue == 41) {
+                        BufferedImage heartSprite = ImageIO.read(new File("resources/itens/full_heart.png"));
+                        items.add(new Item(x * 16, y * 16, heartSprite));
+                    }else if (red == 0 && green == 255 && blue == 0) {
                         enemies.add(new Enemy(x * 16, y * 16));
                     }
-                    else if (red == 0 && green == 255 && blue == 0) {
-                        System.out.println("Vapo");
+                    else if (red == 137 && green == 81 && blue == 41) {
+                        dirtBlocks.add(new DirtBlock(x * 16, y * 16));
                     }else {
                         System.out.println("Pixel desconhecido em (" + x + "," + y + "): R=" + red + " G=" + green + " B=" + blue);
                     }
