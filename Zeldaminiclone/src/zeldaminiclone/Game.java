@@ -23,6 +23,8 @@ public class Game extends Canvas implements Runnable, KeyListener {
     public static final int maxLevel = 4;
     public static boolean nearExit = false;
 
+    public static String gameState = "MENU";
+
     public Game(){
         thread = new Thread(this);
         player = new Player(0,0);
@@ -59,9 +61,11 @@ public class Game extends Canvas implements Runnable, KeyListener {
 
     //Lógica de atualização das ações
     public void tick(){
-        player.tick();
-        for (Enemy e : World.enemies) {
-            e.tick();
+        if (gameState.equals("NORMAL")) {
+            player.tick();
+            for (Enemy e : World.enemies) {
+                e.tick();
+            }
         }
     }
 
@@ -77,20 +81,20 @@ public class Game extends Canvas implements Runnable, KeyListener {
         g.setColor(Color.BLACK);
         g.fillRect(0,0,WIDTH*SCALE,HEIGHT*SCALE);
 
-        g.scale(SCALE,SCALE);
-
-        //Pinta o mapa
-        world.render(g);
-        //Pinta os itens
-        world.renderItens(g);
-        //Pinta os inimigos
-        for (Enemy e : World.enemies) {
-            e.render(g);
+        if (gameState.equals("MENU")) {
+            renderMenu(g);
+        } else if (gameState.equals("NORMAL")) {
+            g.scale(SCALE, SCALE);
+            world.render(g);
+            world.renderItens(g);
+            for (Enemy e : World.enemies) {
+                e.render(g);
+            }
+            player.render(g);
+            renderHUD(g);
+        } else if (gameState.equals("GAME_OVER")) {
+            renderGameOver(g);
         }
-        //Pinta o player
-        player.render(g);
-        //Pinta o HUD
-        renderHUD(g);
 
         g.dispose();
         bs.show();
@@ -130,6 +134,16 @@ public class Game extends Canvas implements Runnable, KeyListener {
         }
         if (e.getKeyCode() == KeyEvent.VK_E){
             trocarFase();
+        }
+        if (gameState.equals("MENU") || gameState.equals("GAME_OVER")) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                // Reinicia o jogo
+                player.vida = 50;
+                player.itensColetados = 0;
+                Game.currentLevel = 1;
+                restartGame("resources/map/map_1.png");
+                gameState = "NORMAL";
+            }
         }
     }
 
@@ -178,8 +192,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
     }
 
     public static void gameOver(){
-        System.out.println("GAME OVER");
-        System.exit(0);
+        Game.gameState = "GAME_OVER";
     }
 
     //Limpar elementos e gerar nova fase
@@ -188,5 +201,26 @@ public class Game extends Canvas implements Runnable, KeyListener {
         World.items.clear();
         World.enemies.clear();
         world = new World(levelPath);
+    }
+
+    public void renderMenu(Graphics g) {
+        g.setColor(Color.black);
+        g.fillRect(0, 0, WIDTH * SCALE, HEIGHT * SCALE);
+        g.setColor(Color.white);
+        g.setFont(new Font("Arial", Font.BOLD, 40));
+        g.drawString("Zelda Mini Clone", 80, 150);
+        g.setFont(new Font("Arial", Font.PLAIN, 12));
+        g.drawString("Pressione ENTER para começar", 65, 190);
+    }
+
+    public void renderGameOver(Graphics g) {
+        g.setColor(Color.black);
+        g.fillRect(0, 0, WIDTH * SCALE, HEIGHT * SCALE);
+        g.setColor(Color.red);
+        g.setFont(new Font("Arial", Font.BOLD, 40));
+        g.drawString("GAME OVER", 100, 150);
+        g.setFont(new Font("Arial", Font.PLAIN, 24));
+        g.setColor(Color.white);
+        g.drawString("Pressione ENTER para reiniciar", 85, 180);
     }
 }
