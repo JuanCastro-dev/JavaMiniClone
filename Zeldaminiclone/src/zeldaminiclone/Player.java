@@ -1,5 +1,7 @@
 package zeldaminiclone;
 
+import zeldaminiclone.resources.Sounds;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -106,6 +108,7 @@ public class Player extends Rectangle {
                 i--;
                 itensColetados++;
                 vida += 25;
+                new Sounds("resources/sounds/nice.wav").play();
                 if (vida > 50) vida = 50;
                 break;
             }
