@@ -118,6 +118,7 @@ public class Player extends Rectangle {
             if (this.intersects(e)) {
                 vida -= 1;
                 System.out.println("Colidiu com o inimigo!"); // Aqui você poderia reduzir vida, reiniciar fase, etc.
+                new Sounds("resources/sounds/oof.wav").play();
                 if (vida == 0) Game.gameOver();
             }
         }

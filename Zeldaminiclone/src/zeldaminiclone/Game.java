@@ -1,5 +1,7 @@
 package zeldaminiclone;
 
+import zeldaminiclone.resources.Sounds;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyListener;
@@ -25,6 +27,8 @@ public class Game extends Canvas implements Runnable, KeyListener {
 
     public static String gameState = "MENU";
 
+    private Sounds music;
+
     public Game(){
         thread = new Thread(this);
         player = new Player(0,0);
@@ -38,6 +42,9 @@ public class Game extends Canvas implements Runnable, KeyListener {
         this.addKeyListener(this);
 
         thread.start();
+
+        music = new Sounds("resources/sounds/ritmada.wav");
+        music.loop();
     }
 
     public void initFrame(){
