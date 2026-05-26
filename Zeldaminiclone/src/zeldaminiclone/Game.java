@@ -154,6 +154,9 @@ public class Game extends Canvas implements Runnable, KeyListener {
                 Game.currentLevel = 1;
                 restartGame("resources/map/map_1.png");
                 gameState = "NORMAL";
+                music.stop();
+                music = new Sounds("resources/sounds/music_1.wav");
+                music.loop();
             }
         }
     }
@@ -163,6 +166,11 @@ public class Game extends Canvas implements Runnable, KeyListener {
         nearExit = false;
         if (currentLevel >= maxLevel) return;
         currentLevel++;
+
+        music.stop();
+        music = new Sounds("resources/sounds/music_"+currentLevel+".wav");
+        music.loop();
+
         restartGame("resources/map/map_" + currentLevel + ".png");
     }
 
