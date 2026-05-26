@@ -19,11 +19,17 @@ public class World {
     public static int WIDTH, HEIGHT;
 
     private static BufferedImage background;
+    private static BufferedImage pressEImage;
+    public static int exitX = -1, exitY = -1;
 
     public World(String path) {
         try {
             String bgPath = path.contains("map_2") ? "resources/map/dirt_floor.png" : "resources/map/map_grass.png";
             background = ImageIO.read(new File(bgPath));
+
+            if (pressEImage == null) {
+                pressEImage = ImageIO.read(new File("resources/interaction/press_e.png"));
+            }
 
             BufferedImage map = ImageIO.read(new File(path));
             WIDTH = map.getWidth();
@@ -51,7 +57,8 @@ public class World {
                     else if (red == 137 && green == 81 && blue == 41) {
                         dirtBlocks.add(new DirtBlock(x * 16, y * 16));
                     } else if (red == 255 && green == 255 && blue == 0) {
-                        Game.nearExit = true;
+                        exitX = x * 16;
+                        exitY = y * 16;
                     } else {
                         System.out.println("Pixel desconhecido em (" + x + "," + y + "): R=" + red + " G=" + green + " B=" + blue);
                     }
@@ -75,6 +82,12 @@ public class World {
     public void renderItens(Graphics g) {
         for (Item item : items) {
             item.render(g);
+        }
+    }
+
+    public void renderExit(Graphics g) {
+        if (exitX >= 0 && Game.nearExit && pressEImage != null) {
+            g.drawImage(pressEImage, exitX - Camera.x, exitY - Camera.y, null);
         }
     }
 

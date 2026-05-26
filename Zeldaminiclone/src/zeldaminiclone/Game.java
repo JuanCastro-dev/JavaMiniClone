@@ -66,6 +66,9 @@ public class Game extends Canvas implements Runnable, KeyListener {
             for (Enemy e : World.enemies) {
                 e.tick();
             }
+            nearExit = World.exitX >= 0 &&
+                Math.abs(player.x - World.exitX) < 16 &&
+                Math.abs(player.y - World.exitY) < 16;
         }
     }
 
@@ -91,6 +94,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
                 e.render(g);
             }
             player.render(g);
+            world.renderExit(g);
             renderHUD(g);
         } else if (gameState.equals("GAME_OVER")) {
             renderGameOver(g);
@@ -149,6 +153,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
 
     public void trocarFase() {
         if (!nearExit) return;
+        nearExit = false;
         if (currentLevel >= maxLevel) return;
         currentLevel++;
         restartGame("resources/map/map_" + currentLevel + ".png");
