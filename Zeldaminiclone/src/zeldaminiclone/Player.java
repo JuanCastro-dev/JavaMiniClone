@@ -30,6 +30,9 @@ public class Player extends Rectangle {
     private int maxFrames = 10;
     private int maxAnimation = 2;
 
+    public static int score = 0;
+    public static int highScore = 0;
+
     public Player(int x, int y) {
         super(x, y, 16, 16);
         this.x = x;
@@ -105,6 +108,7 @@ public class Player extends Rectangle {
             Item item = World.items.get(i);
             if (this.intersects(item)) {
                 World.items.remove(item);
+                score += 100;
                 i--;
                 itensColetados++;
                 vida += 25;

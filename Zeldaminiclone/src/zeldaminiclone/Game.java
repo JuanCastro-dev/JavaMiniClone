@@ -1,5 +1,6 @@
 package zeldaminiclone;
 
+import zeldaminiclone.resources.Save;
 import zeldaminiclone.resources.Sounds;
 
 import javax.swing.*;
@@ -30,6 +31,8 @@ public class Game extends Canvas implements Runnable, KeyListener {
     private Sounds music;
 
     public Game(){
+        Player.highScore = Save.loadScore();
+
         thread = new Thread(this);
         player = new Player(0,0);
         world = new World("resources/map/map_1.png");
@@ -146,6 +149,10 @@ public class Game extends Canvas implements Runnable, KeyListener {
         if (e.getKeyCode() == KeyEvent.VK_E){
             trocarFase();
         }
+        if (gameState.equals("GAME_OVER") && Player.score > Player.highScore) {
+            Player.highScore = Player.score;
+            Save.saveScore(Player.highScore);
+        }
         if (gameState.equals("MENU") || gameState.equals("GAME_OVER")) {
             if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                 // Reinicia o jogo
@@ -158,6 +165,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
                 music = new Sounds("resources/sounds/music_1.wav");
                 music.loop();
             }
+            Player.score = 0;
         }
     }
 
@@ -206,9 +214,14 @@ public class Game extends Canvas implements Runnable, KeyListener {
 
         //Itens coletados
         g.setColor(Color.WHITE);
-        Font font = new Font("arial", Font.BOLD, 6);
+        Font font = new Font("arial", Font.BOLD, 5);
         g.setFont(font);
         g.drawString("Itens coletados: "+ player.itensColetados,10,25);
+
+        //Pontuação do jogador
+        g.setColor(Color.white);
+        g.drawString("Pontos: " + Player.score, 10, 35);
+        g.drawString("Recorde: " + Player.highScore, 10, 45);
     }
 
     public static void gameOver(){
