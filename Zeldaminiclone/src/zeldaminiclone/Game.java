@@ -30,6 +30,11 @@ public class Game extends Canvas implements Runnable, KeyListener {
 
     private Sounds music;
 
+    private int fadeFrames = 0;
+    private boolean fadeIn = false;
+    private boolean fadeOut = false;
+    private boolean pendingLevelChange = false;
+
     public Game(){
         Player.highScore = Save.loadScore();
 
@@ -80,6 +85,14 @@ public class Game extends Canvas implements Runnable, KeyListener {
                 Math.abs(player.x - World.exitX) < 16 &&
                 Math.abs(player.y - World.exitY) < 16;
         }
+        if (gameState.equals("GAME_OVER")) {
+            fadeFrames++;
+            if (fadeFrames > 120) {
+                fadeFrames = 0;
+                gameState = "MENU";
+            }
+            return;
+        }
     }
 
     public void render(){
@@ -109,6 +122,8 @@ public class Game extends Canvas implements Runnable, KeyListener {
         } else if (gameState.equals("GAME_OVER")) {
             renderGameOver(g);
         }
+
+        renderFade(g);
 
         g.dispose();
         bs.show();
@@ -155,7 +170,10 @@ public class Game extends Canvas implements Runnable, KeyListener {
         }
         if (gameState.equals("MENU") || gameState.equals("GAME_OVER")) {
             if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                // Reinicia o jogo
+                if (gameState.equals("MENU")){
+                    fadeIn = true;
+                    fadeFrames = 255;
+                }
                 player.vida = 50;
                 player.itensColetados = 0;
                 Game.currentLevel = 1;
@@ -170,16 +188,13 @@ public class Game extends Canvas implements Runnable, KeyListener {
     }
 
     public void trocarFase() {
-        if (!nearExit) return;
+        if (!nearExit || fadeOut || pendingLevelChange) return;
         nearExit = false;
         if (currentLevel >= maxLevel) return;
         currentLevel++;
-
-        music.stop();
-        music = new Sounds("resources/sounds/music_"+currentLevel+".wav");
-        music.loop();
-
-        restartGame("resources/map/map_" + currentLevel + ".png");
+        pendingLevelChange = true;
+        fadeOut = true;
+        fadeFrames = 0;
     }
 
     @Override
@@ -222,6 +237,35 @@ public class Game extends Canvas implements Runnable, KeyListener {
         g.setColor(Color.white);
         g.drawString("Pontos: " + Player.score, 10, 35);
         g.drawString("Recorde: " + Player.highScore, 10, 45);
+    }
+
+    public void renderFade(Graphics g) {
+        if (fadeIn) {
+            fadeFrames -= 5;
+            if (fadeFrames <= 0) {
+                fadeFrames = 0;
+                fadeIn = false;
+            }
+        } else if (fadeOut) {
+            fadeFrames += 5;
+            if (fadeFrames >= 255) {
+                fadeFrames = 255;
+                fadeOut = false;
+                Player.score += 500;
+                fadeIn = true;
+                if (pendingLevelChange) {
+                    pendingLevelChange = false;
+                    music.stop();
+                    music = new Sounds("resources/sounds/music_" + currentLevel + ".wav");
+                    music.loop();
+                    restartGame("resources/map/map_" + currentLevel + ".png");
+                }
+            }
+        }
+        if (fadeFrames > 0) {
+            g.setColor(new Color(0, 0, 0, fadeFrames));
+            g.fillRect(0, 0, WIDTH * SCALE, HEIGHT * SCALE);
+        }
     }
 
     public static void gameOver(){
