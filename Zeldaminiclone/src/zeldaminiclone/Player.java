@@ -33,6 +33,9 @@ public class Player extends Rectangle {
     public static int score = 0;
     public static int highScore = 0;
 
+    private boolean damaged = false;
+    private int damageFrames = 0;
+
     public Player(int x, int y) {
         super(x, y, 16, 16);
         this.x = x;
@@ -121,15 +124,27 @@ public class Player extends Rectangle {
         for (Enemy e : World.enemies) {
             if (this.intersects(e)) {
                 vida -= 1;
-                System.out.println("Colidiu com o inimigo!"); // Aqui você poderia reduzir vida, reiniciar fase, etc.
+                damaged = true;
+                damageFrames = 0;
                 new Sounds("resources/sounds/oof.wav").play();
                 if (vida == 0) Game.gameOver();
+                break;
+            }
+        }
+
+        if(damaged){
+            damageFrames++;
+            if(damageFrames >= 15){
+                damaged = false;
+                damageFrames = 0;
             }
         }
     }
 
     public void render(Graphics g) {
-        g.drawImage(curDirection[curAnimation], x - Camera.x, y - Camera.y, null);
+        if (!damaged || (damageFrames % 5 == 0)) {
+            g.drawImage(curDirection[curAnimation], x - Camera.x, y - Camera.y, null);
+        }
     }
 
     private void movePlayerAnimation(BufferedImage[] sprites){
