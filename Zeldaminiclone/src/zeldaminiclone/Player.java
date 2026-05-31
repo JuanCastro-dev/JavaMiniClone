@@ -121,20 +121,20 @@ public class Player extends Rectangle {
             }
         }
 
-        for (Enemy e : World.enemies) {
-            if (this.intersects(e)) {
-                vida -= 1;
-                damaged = true;
-                damageFrames = 0;
-                new Sounds("resources/sounds/oof.wav").play();
-                if (vida == 0) Game.gameOver();
-                break;
+        if (!damaged) {
+            for (Enemy e : World.enemies) {
+                if (this.intersects(e)) {
+                    vida -= 1;
+                    damaged = true;
+                    damageFrames = 0;
+                    new Sounds("resources/sounds/oof.wav").play();
+                    if (vida == 0) Game.gameOver();
+                    break;
+                }
             }
-        }
-
-        if(damaged){
+        } else {
             damageFrames++;
-            if(damageFrames >= 15){
+            if (damageFrames >= 60) {
                 damaged = false;
                 damageFrames = 0;
             }
@@ -142,7 +142,7 @@ public class Player extends Rectangle {
     }
 
     public void render(Graphics g) {
-        if (!damaged || (damageFrames % 5 == 0)) {
+        if (vida > 0 && (!damaged || (damageFrames % 5 == 0))) {
             g.drawImage(curDirection[curAnimation], x - Camera.x, y - Camera.y, null);
         }
     }
