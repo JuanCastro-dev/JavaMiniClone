@@ -41,6 +41,17 @@ public class Player extends Rectangle {
     private int takingItemFrames = 0;
     private BufferedImage takingItemSprite;
 
+    private boolean attacking = false;
+    private int attackFrames = 0;
+    private static final int ATTACK_DURATION = 20;
+    private BufferedImage attackSprite;
+    private BufferedImage attackUp, attackDown, attackLeft, attackRight;
+    private int lastDir = 0; // 0=down, 1=up, 2=right, 3=left
+
+    public boolean hasSword = false;
+    private int swordHintFrames = 0;
+    private static final int SWORD_HINT_DURATION = 300; // 5 segundos a 60fps
+
     public Player(int x, int y) {
         super(x, y, 16, 16);
         this.x = x;
@@ -62,6 +73,11 @@ public class Player extends Rectangle {
             spritesLeft[1] = ImageIO.read(getClass().getResourceAsStream("/player/player_left2.png"));
 
             takingItemSprite = ImageIO.read(getClass().getResourceAsStream("/player/player_taking_item.png"));
+            attackDown  = ImageIO.read(getClass().getResourceAsStream("/player/attack_down.png"));
+            attackUp    = ImageIO.read(getClass().getResourceAsStream("/player/attack_up.png"));
+            attackRight = ImageIO.read(getClass().getResourceAsStream("/player/attack_right.png"));
+            attackLeft  = ImageIO.read(getClass().getResourceAsStream("/player/attack_left.png"));
+            attackSprite = attackDown;
 
 
         } catch (IOException e) {
@@ -103,17 +119,17 @@ public class Player extends Rectangle {
             movedDown = true;
         }
 
-        if (movedRight){
-            movePlayerAnimation(spritesRight);
-        }
-        if(movedLeft){
-            movePlayerAnimation(spritesLeft);
-        }
-        if (movedUp){
-            movePlayerAnimation(spritesBack);
-        }
-        if(movedDown){
-            movePlayerAnimation(spritesFront);
+        if (movedRight)  { movePlayerAnimation(spritesRight); lastDir = 2; }
+        if (movedLeft)   { movePlayerAnimation(spritesLeft);  lastDir = 3; }
+        if (movedUp)     { movePlayerAnimation(spritesBack);  lastDir = 1; }
+        if (movedDown)   { movePlayerAnimation(spritesFront); lastDir = 0; }
+
+        if (attacking) {
+            attackFrames++;
+            if (attackFrames >= ATTACK_DURATION) {
+                attacking = false;
+                attackFrames = 0;
+            }
         }
 
         Camera.x = Camera.clamp(x - (Game.WIDTH / 2), 0, (World.WIDTH * 16) -
@@ -137,6 +153,8 @@ public class Player extends Rectangle {
                     new Sounds("resources/sounds/get_item.wav").play();
                     takingItem = true;
                     takingItemFrames = 0;
+                    hasSword = true;
+                    swordHintFrames = SWORD_HINT_DURATION;
                 }
                 if (vida > 50) vida = 50;
                 break;
@@ -163,9 +181,46 @@ public class Player extends Rectangle {
         }
     }
 
+    public void attack() {
+        if (!hasSword || attacking || takingItem) return;
+        attacking = true;
+        attackFrames = 0;
+        attackSprite = switch (lastDir) {
+            case 1 -> attackUp;
+            case 2 -> attackRight;
+            case 3 -> attackLeft;
+            default -> attackDown;
+        };
+        int reach = 2;
+        Rectangle hitbox = switch (lastDir) {
+            case 1 -> new Rectangle(x, y - reach, 16, 16 + reach);
+            case 2 -> new Rectangle(x, y, 16 + reach, 16);
+            case 3 -> new Rectangle(x - reach, y, 16 + reach, 16);
+            default -> new Rectangle(x, y, 16, 16 + reach);
+        };
+        for (int i = World.enemies.size() - 1; i >= 0; i--) {
+            if (hitbox.intersects(World.enemies.get(i))) {
+                World.enemies.remove(i);
+                score += 200;
+            }
+        }
+    }
+
+    public void renderSwordHint(Graphics g) {
+        if (swordHintFrames <= 0) return;
+        swordHintFrames--;
+        g.setColor(Color.YELLOW);
+        g.setFont(new Font("Arial", Font.BOLD, 6));
+        String msg = "Pressione F para atacar!";
+        int msgWidth = g.getFontMetrics().stringWidth(msg);
+        g.drawString(msg, (Game.WIDTH - msgWidth) / 2, Game.HEIGHT - 6);
+    }
+
     public void render(Graphics g) {
         if (takingItem) {
             g.drawImage(takingItemSprite, x - Camera.x, y - Camera.y, null);
+        } else if (attacking) {
+            g.drawImage(attackSprite, x - Camera.x, y - Camera.y, null);
         } else if (vida > 0 && (!damaged || (damageFrames % 5 == 0))) {
             g.drawImage(curDirection[curAnimation], x - Camera.x, y - Camera.y, null);
         }

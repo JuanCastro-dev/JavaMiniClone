@@ -119,6 +119,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
             }
             player.render(g);
             world.renderExit(g);
+            player.renderSwordHint(g);
             renderHUD(g);
         } else if (gameState.equals("GAME_OVER")) {
             renderGameOver(g);
@@ -168,6 +169,9 @@ public class Game extends Canvas implements Runnable, KeyListener {
         }
         if (e.getKeyCode() == KeyEvent.VK_E){
             trocarFase();
+        }
+        if (e.getKeyCode() == KeyEvent.VK_F && gameState.equals("NORMAL")) {
+            player.attack();
         }
         if (gameState.equals("GAME_OVER") && Player.score > Player.highScore) {
             Player.highScore = Player.score;
