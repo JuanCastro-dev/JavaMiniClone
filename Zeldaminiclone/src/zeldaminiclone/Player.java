@@ -59,7 +59,6 @@ public class Player extends Rectangle {
         curDirection = spritesFront;
 
         try {
-            // Carrega a imagem diretamente.
             spritesFront[0] = ImageIO.read(getClass().getResourceAsStream("/player/player_front.png"));
             spritesFront[1] = ImageIO.read(getClass().getResourceAsStream("/player/player_front2.png"));
 
@@ -79,7 +78,6 @@ public class Player extends Rectangle {
             attackLeft  = ImageIO.read(getClass().getResourceAsStream("/player/attack_left.png"));
             attackSprite = attackDown;
 
-
         } catch (IOException e) {
             System.err.println("Erro ao carregar a imagem do Player!");
             e.printStackTrace();
@@ -90,11 +88,19 @@ public class Player extends Rectangle {
 
     public void tick() throws IOException {
 
-        if (takingItem) {
-            takingItemFrames++;
-            if (takingItemFrames >= 120) {
-                takingItem = false;
-                takingItemFrames = 0;
+        if (takingItem || attacking) {
+            if (attacking) {
+                attackFrames++;
+                if (attackFrames >= ATTACK_DURATION) {
+                    attacking = false;
+                    attackFrames = 0;
+                }
+            } else {
+                takingItemFrames++;
+                if (takingItemFrames >= 120) {
+                    takingItem = false;
+                    takingItemFrames = 0;
+                }
             }
             return;
         }
@@ -124,18 +130,8 @@ public class Player extends Rectangle {
         if (movedUp)     { movePlayerAnimation(spritesBack);  lastDir = 1; }
         if (movedDown)   { movePlayerAnimation(spritesFront); lastDir = 0; }
 
-        if (attacking) {
-            attackFrames++;
-            if (attackFrames >= ATTACK_DURATION) {
-                attacking = false;
-                attackFrames = 0;
-            }
-        }
-
-        Camera.x = Camera.clamp(x - (Game.WIDTH / 2), 0, (World.WIDTH * 16) -
-                Game.WIDTH);
-        Camera.y = Camera.clamp(y - (Game.HEIGHT / 2), 0, (World.HEIGHT * 16) -
-                Game.HEIGHT);
+        Camera.x = Camera.clamp(x - (Game.WIDTH / 2), 0, (World.WIDTH * 16) - Game.WIDTH);
+        Camera.y = Camera.clamp(y - (Game.HEIGHT / 2), 0, (World.HEIGHT * 16) - Game.HEIGHT);
 
         this.setBounds(x, y, 16, 16);
 
@@ -191,7 +187,7 @@ public class Player extends Rectangle {
             case 3 -> attackLeft;
             default -> attackDown;
         };
-        int reach = 2;
+        int reach = 4;
         Rectangle hitbox = switch (lastDir) {
             case 1 -> new Rectangle(x, y - reach, 16, 16 + reach);
             case 2 -> new Rectangle(x, y, 16 + reach, 16);
@@ -199,9 +195,13 @@ public class Player extends Rectangle {
             default -> new Rectangle(x, y, 16, 16 + reach);
         };
         for (int i = World.enemies.size() - 1; i >= 0; i--) {
-            if (hitbox.intersects(World.enemies.get(i))) {
-                World.enemies.remove(i);
-                score += 200;
+            Enemy e = World.enemies.get(i);
+            if (hitbox.intersects(e)) {
+                e.takeDamage(10, lastDir);
+                if (e.vida <= 0) {
+                    World.enemies.remove(i);
+                    score += 200;
+                }
             }
         }
     }

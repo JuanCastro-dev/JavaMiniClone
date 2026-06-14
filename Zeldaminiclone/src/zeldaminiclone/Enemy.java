@@ -14,6 +14,9 @@ public class Enemy extends Rectangle {
 
     private int speed = 1;
     private Random rand;
+    public int vida = 20;
+
+    private float knockbackX = 0, knockbackY = 0;
 
     private BufferedImage[] curDirection = new BufferedImage[2];
     private int curAnimation = 0;
@@ -49,6 +52,19 @@ public class Enemy extends Rectangle {
     }
 
     public void tick() {
+        if (knockbackX != 0 || knockbackY != 0) {
+            int nx = x + (int) knockbackX;
+            int ny = y + (int) knockbackY;
+            if (World.isFree(nx, y)) x = nx;
+            if (World.isFree(x, ny)) y = ny;
+            knockbackX *= 0.75f;
+            knockbackY *= 0.75f;
+            if (Math.abs(knockbackX) < 0.5f) knockbackX = 0;
+            if (Math.abs(knockbackY) < 0.5f) knockbackY = 0;
+            this.setBounds(x, y, 16, 16);
+            return;
+        }
+
         dirFrames++;
         if (dirFrames >= maxDirFrames) {
             dirFrames = 0;
@@ -78,6 +94,16 @@ public class Enemy extends Rectangle {
         if (frames >= maxFrames) {
             frames = 0;
             curAnimation = (curAnimation + 1) % 2;
+        }
+    }
+
+    public void takeDamage(int damage, int playerDir) {
+        vida -= damage;
+        switch (playerDir) {
+            case 0 -> knockbackY =  8;
+            case 1 -> knockbackY = -8;
+            case 2 -> knockbackX =  8;
+            case 3 -> knockbackX = -8;
         }
     }
 
