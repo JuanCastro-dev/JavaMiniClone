@@ -37,6 +37,10 @@ public class Player extends Rectangle {
     private boolean damaged = false;
     private int damageFrames = 0;
 
+    private boolean takingItem = false;
+    private int takingItemFrames = 0;
+    private BufferedImage takingItemSprite;
+
     public Player(int x, int y) {
         super(x, y, 16, 16);
         this.x = x;
@@ -57,6 +61,8 @@ public class Player extends Rectangle {
             spritesLeft[0] = ImageIO.read(getClass().getResourceAsStream("/player/player_left.png"));
             spritesLeft[1] = ImageIO.read(getClass().getResourceAsStream("/player/player_left2.png"));
 
+            takingItemSprite = ImageIO.read(getClass().getResourceAsStream("/player/player_taking_item.png"));
+
 
         } catch (IOException e) {
             System.err.println("Erro ao carregar a imagem do Player!");
@@ -67,6 +73,15 @@ public class Player extends Rectangle {
     }
 
     public void tick() throws IOException {
+
+        if (takingItem) {
+            takingItemFrames++;
+            if (takingItemFrames >= 120) {
+                takingItem = false;
+                takingItemFrames = 0;
+            }
+            return;
+        }
 
         boolean movedDown = false;
         boolean movedUp = false;
@@ -120,6 +135,8 @@ public class Player extends Rectangle {
                     new Sounds("resources/sounds/nice.wav").play();
                 } else if (item.type.equals("sword")) {
                     new Sounds("resources/sounds/get_item.wav").play();
+                    takingItem = true;
+                    takingItemFrames = 0;
                 }
                 if (vida > 50) vida = 50;
                 break;
@@ -147,7 +164,9 @@ public class Player extends Rectangle {
     }
 
     public void render(Graphics g) {
-        if (vida > 0 && (!damaged || (damageFrames % 5 == 0))) {
+        if (takingItem) {
+            g.drawImage(takingItemSprite, x - Camera.x, y - Camera.y, null);
+        } else if (vida > 0 && (!damaged || (damageFrames % 5 == 0))) {
             g.drawImage(curDirection[curAnimation], x - Camera.x, y - Camera.y, null);
         }
     }
