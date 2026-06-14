@@ -5,6 +5,7 @@ import zeldaminiclone.resources.Sounds;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 
 //Atributos e métodos do player
@@ -65,7 +66,7 @@ public class Player extends Rectangle {
         }
     }
 
-    public void tick() {
+    public void tick() throws IOException {
 
         boolean movedDown = false;
         boolean movedUp = false;
@@ -115,7 +116,11 @@ public class Player extends Rectangle {
                 i--;
                 itensColetados++;
                 vida += 25;
-                new Sounds("resources/sounds/nice.wav").play();
+                if (item.type.equals("heart")) {
+                    new Sounds("resources/sounds/nice.wav").play();
+                } else if (item.type.equals("sword")) {
+                    new Sounds("resources/sounds/get_item.wav").play();
+                }
                 if (vida > 50) vida = 50;
                 break;
             }

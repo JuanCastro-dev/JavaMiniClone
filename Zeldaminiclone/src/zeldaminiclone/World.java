@@ -50,7 +50,10 @@ public class World {
                         Game.player.y = y * 16;
                     } else if (red == 255 && green == 0 && blue == 0) {
                         BufferedImage heartSprite = ImageIO.read(new File("resources/itens/full_heart.png"));
-                        items.add(new Item(x * 16, y * 16, heartSprite));
+                        items.add(new Item(x * 16, y * 16, heartSprite, "heart"));
+                    }else if (red == 119 && green == 56 && blue == 56) {
+                            BufferedImage woodenSwordSprite = ImageIO.read(new File("resources/itens/wooden_sword.png"));
+                            items.add(new Item(x * 16, y * 16, woodenSwordSprite, "sword"));
                     }else if (red == 0 && green == 255 && blue == 0) {
                         enemies.add(new Enemy(x * 16, y * 16));
                     }

@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.event.KeyListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
+import java.io.IOException;
 
 public class Game extends Canvas implements Runnable, KeyListener {
 
@@ -75,7 +76,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
     }
 
     //Lógica de atualização das ações
-    public void tick(){
+    public void tick() throws IOException {
         if (gameState.equals("NORMAL")) {
             player.tick();
             for (Enemy e : World.enemies) {
@@ -133,7 +134,11 @@ public class Game extends Canvas implements Runnable, KeyListener {
     @Override
     public void run() {
         while (isRunning){
-            tick();
+            try {
+                tick();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             render();
             try{
                 Thread.sleep(1000/60);  //Define a taxa de 60fps
