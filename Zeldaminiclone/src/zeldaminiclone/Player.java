@@ -14,6 +14,7 @@ public class Player extends Rectangle {
     public int x, y;
     public int speed = 2;
     public int vida = 50;
+    public int maxVida = 50;
     public int itensColetados = 0;
 
     public boolean right, left, up, down;
@@ -151,8 +152,14 @@ public class Player extends Rectangle {
                     takingItemFrames = 0;
                     hasSword = true;
                     swordHintFrames = SWORD_HINT_DURATION;
+                } else if (item.type.equals("armor")) {
+                    new Sounds("resources/sounds/get_item.wav").play();
+                    takingItem = true;
+                    takingItemFrames = 0;
+                    maxVida = 100;
+                    vida = maxVida;
                 }
-                if (vida > 50) vida = 50;
+                if (vida > maxVida) vida = maxVida;
                 break;
             }
         }
@@ -199,7 +206,7 @@ public class Player extends Rectangle {
             case 3 -> attackLeft;
             default -> attackDown;
         };
-        int reach = 4;
+        int reach = 5;
         Rectangle hitbox = switch (lastDir) {
             case 1 -> new Rectangle(x, y - reach, 16, 16 + reach);
             case 2 -> new Rectangle(x, y, 16 + reach, 16);

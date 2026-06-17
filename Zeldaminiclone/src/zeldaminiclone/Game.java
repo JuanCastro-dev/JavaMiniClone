@@ -234,7 +234,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
         g.fillRect(10, 10, 100, 3);
 
         //Vida atual
-        int vidaAtual = player.vida * 100 / 50;
+        int vidaAtual = player.vida * 100 / player.maxVida;
         g.setColor(vidaAtual < 35 ? Color.ORANGE : Color.GREEN);
         g.fillRect(10,10,vidaAtual,3);
 

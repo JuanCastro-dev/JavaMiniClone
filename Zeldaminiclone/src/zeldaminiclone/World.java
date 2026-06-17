@@ -59,8 +59,8 @@ public class World {
                             items.add(new Item(x * 16, y * 16, woodenSwordSprite, "sword"));
                     }
                     else if (red == 54 && green == 51 && blue == 134) {
-                        BufferedImage woodenSwordSprite = ImageIO.read(new File("resources/itens/wooden_sword.png"));
-                        items.add(new Item(x * 16, y * 16, woodenSwordSprite, "sword"));
+                        BufferedImage armorSprite = ImageIO.read(new File("resources/itens/silver_armor.png"));
+                        items.add(new Item(x * 16, y * 16, armorSprite, "armor"));
                     }
                     else if (red == 0 && green == 255 && blue == 0) {
                         enemies.add(new Enemy(x * 16, y * 16));
