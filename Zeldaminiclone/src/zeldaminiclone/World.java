@@ -24,7 +24,7 @@ public class World {
 
     public World(String path) {
         try {
-            String bgPath = path.contains("map_2") ? "resources/map/dirt_floor.png" : "resources/map/map_grass.png";
+            String bgPath = path.contains("map_2") || path.contains("map_3") ? "resources/map/dirt_floor.png" : "resources/map/map_grass.png";
             background = ImageIO.read(new File(bgPath));
 
             if (pressEImage == null) {
@@ -51,15 +51,25 @@ public class World {
                     } else if (red == 255 && green == 0 && blue == 0) {
                         BufferedImage heartSprite = ImageIO.read(new File("resources/itens/full_heart.png"));
                         items.add(new Item(x * 16, y * 16, heartSprite, "heart"));
-                    }else if (red == 119 && green == 56 && blue == 56) {
+                    }
+                    else if (red == 119 && green == 56 && blue == 56) {
                             BufferedImage woodenSwordSprite = ImageIO.read(new File("resources/itens/wooden_sword.png"));
                             items.add(new Item(x * 16, y * 16, woodenSwordSprite, "sword"));
-                    }else if (red == 0 && green == 255 && blue == 0) {
+                    }
+                    else if (red == 54 && green == 51 && blue == 134) {
+                        BufferedImage woodenSwordSprite = ImageIO.read(new File("resources/itens/wooden_sword.png"));
+                        items.add(new Item(x * 16, y * 16, woodenSwordSprite, "sword"));
+                    }
+                    else if (red == 0 && green == 255 && blue == 0) {
+                        enemies.add(new Enemy(x * 16, y * 16));
+                    }
+                    else if (red == 38 && green == 93 && blue == 14) {
                         enemies.add(new Enemy(x * 16, y * 16));
                     }
                     else if (red == 137 && green == 81 && blue == 41) {
                         dirtBlocks.add(new DirtBlock(x * 16, y * 16));
-                    } else if (red == 255 && green == 255 && blue == 0) {
+                    }
+                    else if (red == 255 && green == 255 && blue == 0) {
                         exitX = x * 16;
                         exitY = y * 16;
                     } else {

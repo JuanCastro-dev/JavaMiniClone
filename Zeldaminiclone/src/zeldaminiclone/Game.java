@@ -284,8 +284,11 @@ public class Game extends Canvas implements Runnable, KeyListener {
     //Limpar elementos e gerar nova fase
     public void restartGame(String levelPath) {
         World.blocks.clear();
+        World.dirtBlocks.clear();
         World.items.clear();
         World.enemies.clear();
+        World.exitX = -1;
+        World.exitY = -1;
         world = new World(levelPath);
     }
 
