@@ -1,6 +1,7 @@
 package zeldaminiclone.enemies;
 
 import zeldaminiclone.Camera;
+import zeldaminiclone.Game;
 import zeldaminiclone.World;
 
 import javax.imageio.ImageIO;
@@ -15,7 +16,10 @@ public class Mummy extends Rectangle {
     private BufferedImage[] spritesRight = new BufferedImage[2];
     private BufferedImage[] spritesLeft = new BufferedImage[2];
 
+    private BufferedImage attackDown, attackUp, attackLeft, attackRight;
+
     private int speed = 1;
+    private int moveDelay = 0;
     private Random rand;
     public int vida = 40;
 
@@ -28,6 +32,11 @@ public class Mummy extends Rectangle {
     private int dirFrames = 0;
     private int maxDirFrames = 60;
     private int curDir = 0;
+
+    private boolean attacking = false;
+    private int attackFrames = 0;
+    private static final int ATTACK_DURATION = 20;
+    private BufferedImage curAttackSprite;
 
     public Mummy(int x, int y) {
         super(x, y, 16, 16);
@@ -48,6 +57,11 @@ public class Mummy extends Rectangle {
             spritesLeft[0] = ImageIO.read(getClass().getResourceAsStream("/mummy/mummy_left1.png"));
             spritesLeft[1] = ImageIO.read(getClass().getResourceAsStream("/mummy/mummy_left2.png"));
 
+            attackDown  = ImageIO.read(getClass().getResourceAsStream("/mummy/mummy_attack_down.png"));
+            attackUp    = ImageIO.read(getClass().getResourceAsStream("/mummy/mummy_attack_up.png"));
+            attackRight = ImageIO.read(getClass().getResourceAsStream("/mummy/mummy_attack_right.png"));
+            attackLeft  = ImageIO.read(getClass().getResourceAsStream("/mummy/mummy_attack_left.png"));
+
         } catch (Exception e) {
             System.err.println("Erro ao carregar a imagem dos inimigos!");
             e.printStackTrace();
@@ -55,6 +69,14 @@ public class Mummy extends Rectangle {
     }
 
     public void tick() {
+        if (attacking) {
+            attackFrames++;
+            if (attackFrames >= ATTACK_DURATION) {
+                attacking = false;
+                attackFrames = 0;
+            }
+        }
+
         if (knockbackX != 0 || knockbackY != 0) {
             int nx = x + (int) knockbackX;
             int ny = y + (int) knockbackY;
@@ -74,6 +96,13 @@ public class Mummy extends Rectangle {
             curDir = rand.nextInt(4);
         }
 
+        moveDelay++;
+        if (moveDelay < 2) {
+            this.setBounds(x, y, 16, 16);
+            return;
+        }
+        moveDelay = 0;
+
         if (curDir == 0 && World.isFree(x + speed, y)) {
             x += speed;
             moveAnimation(spritesRight);
@@ -88,7 +117,25 @@ public class Mummy extends Rectangle {
             moveAnimation(spritesFront);
         }
 
+        // verifica colisão com o player para disparar animação de ataque
+        if (this.intersects(Game.player)) {
+            triggerAttack();
+        }
+
         this.setBounds(x, y, 16, 16);
+    }
+
+    private void triggerAttack() {
+        if (attacking) return;
+        attacking = true;
+        attackFrames = 0;
+        int px = Game.player.x, py = Game.player.y;
+        int dx = px - x, dy = py - y;
+        if (Math.abs(dx) >= Math.abs(dy)) {
+            curAttackSprite = dx >= 0 ? attackRight : attackLeft;
+        } else {
+            curAttackSprite = dy >= 0 ? attackDown : attackUp;
+        }
     }
 
     private void moveAnimation(BufferedImage[] sprites) {
@@ -111,6 +158,10 @@ public class Mummy extends Rectangle {
     }
 
     public void render(Graphics g) {
-        g.drawImage(curDirection[curAnimation], x - Camera.x, y - Camera.y, null);
+        if (attacking && curAttackSprite != null) {
+            g.drawImage(curAttackSprite, x - Camera.x, y - Camera.y, null);
+        } else {
+            g.drawImage(curDirection[curAnimation], x - Camera.x, y - Camera.y, null);
+        }
     }
 }

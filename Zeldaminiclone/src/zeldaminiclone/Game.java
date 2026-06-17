@@ -20,7 +20,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
     private Thread thread;
     private boolean isRunning = true;
 
-    static Player player;
+    public static Player player;
     static World world;
 
     public static int currentLevel = 1;
