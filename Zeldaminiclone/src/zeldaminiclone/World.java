@@ -1,6 +1,7 @@
 package zeldaminiclone;
 
 import zeldaminiclone.blocks.DirtBlock;
+import zeldaminiclone.enemies.Mummy;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -16,6 +17,7 @@ public class World {
     public static ArrayList<DirtBlock> dirtBlocks = new ArrayList<>();
     public static ArrayList<Item> items = new ArrayList<>();
     public static ArrayList<Enemy> enemies = new ArrayList<>();
+    public static ArrayList<Mummy> mummies = new ArrayList<>();
     public static int WIDTH, HEIGHT;
 
     private static BufferedImage background;
@@ -64,7 +66,7 @@ public class World {
                         enemies.add(new Enemy(x * 16, y * 16));
                     }
                     else if (red == 38 && green == 93 && blue == 14) {
-                        enemies.add(new Enemy(x * 16, y * 16));
+                        mummies.add(new Mummy(x * 16, y * 16));
                     }
                     else if (red == 137 && green == 81 && blue == 41) {
                         dirtBlocks.add(new DirtBlock(x * 16, y * 16));

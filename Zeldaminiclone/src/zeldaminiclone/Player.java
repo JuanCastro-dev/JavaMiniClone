@@ -168,6 +168,18 @@ public class Player extends Rectangle {
                     break;
                 }
             }
+            if (!damaged) {
+                for (zeldaminiclone.enemies.Mummy m : World.mummies) {
+                    if (this.intersects(m)) {
+                        vida -= 8;
+                        damaged = true;
+                        damageFrames = 0;
+                        new Sounds("resources/sounds/oof.wav").play();
+                        if (vida == 0) Game.gameOver();
+                        break;
+                    }
+                }
+            }
         } else {
             damageFrames++;
             if (damageFrames >= 60) {
@@ -200,6 +212,16 @@ public class Player extends Rectangle {
                 e.takeDamage(10, lastDir);
                 if (e.vida <= 0) {
                     World.enemies.remove(i);
+                    score += 200;
+                }
+            }
+        }
+        for (int i = World.mummies.size() - 1; i >= 0; i--) {
+            zeldaminiclone.enemies.Mummy m = World.mummies.get(i);
+            if (hitbox.intersects(m)) {
+                m.takeDamage(10, lastDir);
+                if (m.vida <= 0) {
+                    World.mummies.remove(i);
                     score += 200;
                 }
             }

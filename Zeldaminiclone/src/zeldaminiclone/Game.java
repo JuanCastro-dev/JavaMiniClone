@@ -82,6 +82,9 @@ public class Game extends Canvas implements Runnable, KeyListener {
             for (Enemy e : World.enemies) {
                 e.tick();
             }
+            for (zeldaminiclone.enemies.Mummy m : World.mummies) {
+                m.tick();
+            }
             nearExit = World.exitX >= 0 &&
                 Math.abs(player.x - World.exitX) < 16 &&
                 Math.abs(player.y - World.exitY) < 16;
@@ -116,6 +119,9 @@ public class Game extends Canvas implements Runnable, KeyListener {
             world.renderItens(g);
             for (Enemy e : World.enemies) {
                 e.render(g);
+            }
+            for (zeldaminiclone.enemies.Mummy m : World.mummies) {
+                m.render(g);
             }
             player.render(g);
             world.renderExit(g);
@@ -287,6 +293,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
         World.dirtBlocks.clear();
         World.items.clear();
         World.enemies.clear();
+        World.mummies.clear();
         World.exitX = -1;
         World.exitY = -1;
         world = new World(levelPath);
