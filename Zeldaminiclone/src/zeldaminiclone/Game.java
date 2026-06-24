@@ -191,6 +191,9 @@ public class Game extends Canvas implements Runnable, KeyListener {
                 }
                 player.vida = 50;
                 player.itensColetados = 0;
+                player.maxVida = 50;
+                player.hasSword = false;
+                player.inventory.clear();
                 Game.currentLevel = 1;
                 restartGame("resources/map/map_1.png");
                 gameState = "NORMAL";
@@ -252,6 +255,22 @@ public class Game extends Canvas implements Runnable, KeyListener {
         g.setColor(Color.white);
         g.drawString("Pontos: " + Player.score, 10, 35);
         g.drawString("Recorde: " + Player.highScore, 10, 45);
+
+        // Inventário
+        int slotSize = 18;
+        int padding = 2;
+        int startX = WIDTH - (slotSize + padding) * 4 - padding;
+        int startY = 6;
+        for (int i = 0; i < 4; i++) {
+            int sx = startX + i * (slotSize + padding);
+            g.setColor(new Color(0, 0, 0, 140));
+            g.fillRect(sx, startY, slotSize, slotSize);
+            g.setColor(new Color(180, 180, 180));
+            g.drawRect(sx, startY, slotSize, slotSize);
+            if (i < player.inventory.size()) {
+                g.drawImage(player.inventory.get(i), sx + 1, startY + 1, slotSize - 2, slotSize - 2, null);
+            }
+        }
     }
 
     public void renderFade(Graphics g) {

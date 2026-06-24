@@ -53,6 +53,8 @@ public class Player extends Rectangle {
     private int swordHintFrames = 0;
     private static final int SWORD_HINT_DURATION = 300; // 5 segundos a 60fps
 
+    public java.util.ArrayList<BufferedImage> inventory = new java.util.ArrayList<>();
+
     public Player(int x, int y) {
         super(x, y, 16, 16);
         this.x = x;
@@ -152,12 +154,14 @@ public class Player extends Rectangle {
                     takingItemFrames = 0;
                     hasSword = true;
                     swordHintFrames = SWORD_HINT_DURATION;
+                    inventory.add(item.getSprite());
                 } else if (item.type.equals("armor")) {
                     new Sounds("resources/sounds/get_item.wav").play();
                     takingItem = true;
                     takingItemFrames = 0;
                     maxVida = 100;
                     vida = maxVida;
+                    inventory.add(item.getSprite());
                 }
                 if (vida > maxVida) vida = maxVida;
                 break;
