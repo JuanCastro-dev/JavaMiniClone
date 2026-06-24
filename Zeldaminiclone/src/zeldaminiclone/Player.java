@@ -237,6 +237,16 @@ public class Player extends Rectangle {
                 }
             }
         }
+        for (int i = World.pharaohs.size() - 1; i >= 0; i--) {
+            zeldaminiclone.enemies.Pharaoh p = World.pharaohs.get(i);
+            if (hitbox.intersects(p)) {
+                p.takeDamage(10, lastDir);
+                if (p.vida <= 0) {
+                    World.pharaohs.remove(i);
+                    score += 1000;
+                }
+            }
+        }
     }
 
     public void renderSwordHint(Graphics g) {
