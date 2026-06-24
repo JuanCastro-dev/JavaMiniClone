@@ -51,7 +51,12 @@ public class Player extends Rectangle {
 
     public boolean hasSword = false;
     private int swordHintFrames = 0;
-    private static final int SWORD_HINT_DURATION = 300; // 5 segundos a 60fps
+    private static final int SWORD_HINT_DURATION = 300;
+
+    public boolean hasStaff = false;
+    public java.util.ArrayList<zeldaminiclone.enemies.Orb> playerOrbs = new java.util.ArrayList<>();
+    private int staffCooldown = 0;
+    private static final int STAFF_COOLDOWN = 60;
 
     public java.util.ArrayList<BufferedImage> inventory = new java.util.ArrayList<>();
 
@@ -138,6 +143,13 @@ public class Player extends Rectangle {
 
         this.setBounds(x, y, 16, 16);
 
+        // atualiza orbes do staff
+        if (staffCooldown > 0) staffCooldown--;
+        for (int i = playerOrbs.size() - 1; i >= 0; i--) {
+            playerOrbs.get(i).tick();
+            if (!playerOrbs.get(i).active) playerOrbs.remove(i);
+        }
+
         for (int i = 0; i < World.items.size(); i++) {
             Item item = World.items.get(i);
             if (this.intersects(item)) {
@@ -161,6 +173,12 @@ public class Player extends Rectangle {
                     takingItemFrames = 0;
                     maxVida = 100;
                     vida = maxVida;
+                    inventory.add(item.getSprite());
+                } else if (item.type.equals("staff")) {
+                    new Sounds("resources/sounds/get_item.wav").play();
+                    takingItem = true;
+                    takingItemFrames = 0;
+                    hasStaff = true;
                     inventory.add(item.getSprite());
                 }
                 if (vida > maxVida) vida = maxVida;
@@ -247,6 +265,16 @@ public class Player extends Rectangle {
                 }
             }
         }
+    }
+
+    public void staffAttack() {
+        if (!hasStaff || staffCooldown > 0 || takingItem || attacking) return;
+        staffCooldown = STAFF_COOLDOWN;
+        int cx = x + 8, cy = y + 8;
+        playerOrbs.add(new zeldaminiclone.enemies.Orb(cx, cy,  1,  0, true));
+        playerOrbs.add(new zeldaminiclone.enemies.Orb(cx, cy, -1,  0, true));
+        playerOrbs.add(new zeldaminiclone.enemies.Orb(cx, cy,  0,  1, true));
+        playerOrbs.add(new zeldaminiclone.enemies.Orb(cx, cy,  0, -1, true));
     }
 
     public void renderSwordHint(Graphics g) {

@@ -88,6 +88,11 @@ public class Game extends Canvas implements Runnable, KeyListener {
             for (zeldaminiclone.enemies.Pharaoh p : World.pharaohs) {
                 p.tick();
             }
+            for (int i = World.pharaohs.size() - 1; i >= 0; i--) {
+                if (World.pharaohs.get(i).isDeathAnimationDone()) {
+                    World.pharaohs.remove(i);
+                }
+            }
             nearExit = World.exitX >= 0 &&
                 Math.abs(player.x - World.exitX) < 16 &&
                 Math.abs(player.y - World.exitY) < 16;
@@ -130,6 +135,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
                 p.render(g);
             }
             player.render(g);
+            for (zeldaminiclone.enemies.Orb orb : player.playerOrbs) orb.render(g);
             world.renderExit(g);
             player.renderSwordHint(g);
             renderHUD(g);
@@ -184,6 +190,9 @@ public class Game extends Canvas implements Runnable, KeyListener {
         }
         if (e.getKeyCode() == KeyEvent.VK_F && gameState.equals("NORMAL")) {
             player.attack();
+        }
+        if (e.getKeyCode() == KeyEvent.VK_G && gameState.equals("NORMAL")) {
+            player.staffAttack();
         }
         if (gameState.equals("GAME_OVER") && Player.score > Player.highScore) {
             Player.highScore = Player.score;

@@ -73,6 +73,9 @@ public class World {
                     else if (red == 128 && green == 0 && blue == 128) {
                         pharaohs.add(new Pharaoh(x * 16, y * 16));
                     }
+                    else if (red == 255 && green == 0 && blue == 242) {
+                        pharaohs.add(new Pharaoh(x * 16, y * 16));
+                    }
                     else if (red == 137 && green == 81 && blue == 41) {
                         dirtBlocks.add(new DirtBlock(x * 16, y * 16));
                     }

@@ -2,62 +2,65 @@ package zeldaminiclone.enemies;
 
 import zeldaminiclone.Camera;
 import zeldaminiclone.Game;
+import zeldaminiclone.Item;
 import zeldaminiclone.World;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class Pharaoh extends Rectangle {
 
-    // sprites de movimento
     private BufferedImage[] spritesFront = new BufferedImage[2];
     private BufferedImage[] spritesBack  = new BufferedImage[2];
     private BufferedImage[] spritesRight = new BufferedImage[2];
     private BufferedImage[] spritesLeft  = new BufferedImage[2];
 
-    // sprites de ataque normal
     private BufferedImage attackDown, attackUp;
     private BufferedImage[] attackRight = new BufferedImage[2];
     private BufferedImage[] attackLeft  = new BufferedImage[2];
-
-    // sprite de poder especial
     private BufferedImage powerSprite;
+    private BufferedImage deathSprite;
 
     private BufferedImage[] curDirection;
     private int curAnimation = 0;
     private int frames = 0;
     private int maxFrames = 10;
     private int dirFrames = 0;
-    private int maxDirFrames = 60;
+    private int maxDirFrames = 120; // dobrado para reduzir velocidade de troca de direção
     private int curDir = 0;
     private Random rand = new Random();
 
-    private int speed = 1;
+    // delay de movimento para reduzir velocidade pela metade
+    private int moveDelay = 0;
+
     public int vida = 300;
-    private int lastPowerThreshold = 300; // dispara poder a cada 50hp perdidos
+    private int lastPowerThreshold = 300;
 
     private float knockbackX = 0, knockbackY = 0;
 
-    // ataque normal
     private boolean normalAttacking = false;
     private int normalAttackFrames = 0;
-    private static final int NORMAL_ATTACK_DURATION = 30;
+    private static final int NORMAL_ATTACK_DURATION = 60; // dobrado
     private static final int ATTACK_RANGE = 20;
-    private static final int ATTACK_COOLDOWN = 90;
+    private static final int ATTACK_COOLDOWN = 180; // dobrado
     private int attackCooldownFrames = 0;
     private BufferedImage curNormalAttackSprite;
 
-    // poder especial
     private boolean powerAttacking = false;
     private int powerFrames = 0;
-    private static final int POWER_DURATION = 20;
-    // controle dos 2 disparos com 1s de intervalo
+    private static final int POWER_DURATION = 40; // dobrado
     private int orbShotCount = 0;
     private int orbShotDelay = 0;
-    private static final int ORB_SHOT_INTERVAL = 60; // 1 segundo
+    private static final int ORB_SHOT_INTERVAL = 60;
+
+    public boolean dead = false;
+    private int deathFrames = 0;
+    private static final int DEATH_DURATION = 90;
+    private boolean droppedItem = false;
 
     public ArrayList<Orb> orbs = new ArrayList<>();
 
@@ -68,27 +71,20 @@ public class Pharaoh extends Rectangle {
         try {
             spritesFront[0] = ImageIO.read(getClass().getResourceAsStream("/farao/farao_front1.png"));
             spritesFront[1] = ImageIO.read(getClass().getResourceAsStream("/farao/farao_front2.png"));
-
             spritesBack[0]  = ImageIO.read(getClass().getResourceAsStream("/farao/farao_up1.png"));
             spritesBack[1]  = ImageIO.read(getClass().getResourceAsStream("/farao/farao_up2.png"));
-
             spritesRight[0] = ImageIO.read(getClass().getResourceAsStream("/farao/farao_right1.png"));
             spritesRight[1] = ImageIO.read(getClass().getResourceAsStream("/farao/farao_right2.png"));
-
             spritesLeft[0]  = ImageIO.read(getClass().getResourceAsStream("/farao/farao_left1.png"));
             spritesLeft[1]  = ImageIO.read(getClass().getResourceAsStream("/farao/farao_left2.png"));
-
-            attackDown  = ImageIO.read(getClass().getResourceAsStream("/farao/farao_attack_down.png"));
-            attackUp    = ImageIO.read(getClass().getResourceAsStream("/farao/farao_attack_up.png"));
-
-            attackRight[0] = ImageIO.read(getClass().getResourceAsStream("/farao/farao_attack_right1.png"));
-            attackRight[1] = ImageIO.read(getClass().getResourceAsStream("/farao/farao_attack_right2.png"));
-
-            attackLeft[0]  = ImageIO.read(getClass().getResourceAsStream("/farao/farao_attack_left1.png"));
-            attackLeft[1]  = ImageIO.read(getClass().getResourceAsStream("/farao/farao_attack_left2.png"));
-
-            powerSprite = ImageIO.read(getClass().getResourceAsStream("/farao/farao_power.png"));
-
+            attackDown      = ImageIO.read(getClass().getResourceAsStream("/farao/farao_attack_down.png"));
+            attackUp        = ImageIO.read(getClass().getResourceAsStream("/farao/farao_attack_up.png"));
+            attackRight[0]  = ImageIO.read(getClass().getResourceAsStream("/farao/farao_attack_right1.png"));
+            attackRight[1]  = ImageIO.read(getClass().getResourceAsStream("/farao/farao_attack_right2.png"));
+            attackLeft[0]   = ImageIO.read(getClass().getResourceAsStream("/farao/farao_attack_left1.png"));
+            attackLeft[1]   = ImageIO.read(getClass().getResourceAsStream("/farao/farao_attack_left2.png"));
+            powerSprite     = ImageIO.read(getClass().getResourceAsStream("/farao/farao_power.png"));
+            deathSprite     = ImageIO.read(getClass().getResourceAsStream("/farao/farao_death.png"));
         } catch (Exception e) {
             System.err.println("Erro ao carregar sprites do Pharaoh!");
             e.printStackTrace();
@@ -96,7 +92,21 @@ public class Pharaoh extends Rectangle {
     }
 
     public void tick() {
-        // atualiza orbes
+        // animação de morte
+        if (dead) {
+            deathFrames++;
+            if (!droppedItem) {
+                droppedItem = true;
+                try {
+                    BufferedImage staffSprite = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+                    // sprite será nulo até o jogador adicionar o arquivo; item ainda é criado
+                    World.items.add(new Item(x, y, staffSprite, "staff"));
+                } catch (Exception ignored) {}
+            }
+            return;
+        }
+
+        // orbes
         for (int i = orbs.size() - 1; i >= 0; i--) {
             orbs.get(i).tick();
             if (!orbs.get(i).active) orbs.remove(i);
@@ -116,14 +126,13 @@ public class Pharaoh extends Rectangle {
             return;
         }
 
-        // verifica se deve disparar poder especial
+        // poder especial
         int threshold = (vida / 50) * 50;
         if (threshold < lastPowerThreshold && !powerAttacking) {
             lastPowerThreshold = threshold;
             triggerPower();
         }
 
-        // poder especial em andamento
         if (powerAttacking) {
             powerFrames++;
             if (orbShotCount < 2) {
@@ -154,12 +163,8 @@ public class Pharaoh extends Rectangle {
             return;
         }
 
-        // cooldown entre ataques normais
-        if (attackCooldownFrames < ATTACK_COOLDOWN) {
-            attackCooldownFrames++;
-        }
+        if (attackCooldownFrames < ATTACK_COOLDOWN) attackCooldownFrames++;
 
-        // verifica proximidade com o player para ataque normal
         int px = Game.player.x, py = Game.player.y;
         int dist = (int) Math.sqrt(Math.pow(px - x, 2) + Math.pow(py - y, 2));
         if (dist <= ATTACK_RANGE && attackCooldownFrames >= ATTACK_COOLDOWN) {
@@ -167,17 +172,24 @@ public class Pharaoh extends Rectangle {
             return;
         }
 
-        // movimento aleatório
+        // movimento com delay (metade da velocidade)
+        moveDelay++;
+        if (moveDelay < 2) {
+            this.setBounds(x, y, 16, 16);
+            return;
+        }
+        moveDelay = 0;
+
         dirFrames++;
         if (dirFrames >= maxDirFrames) {
             dirFrames = 0;
             curDir = rand.nextInt(4);
         }
 
-        if (curDir == 0 && World.isFree(x + speed, y)) { x += speed; moveAnimation(spritesRight); }
-        else if (curDir == 1 && World.isFree(x - speed, y)) { x -= speed; moveAnimation(spritesLeft); }
-        else if (curDir == 2 && World.isFree(x, y - speed)) { y -= speed; moveAnimation(spritesBack); }
-        else if (curDir == 3 && World.isFree(x, y + speed)) { y += speed; moveAnimation(spritesFront); }
+        if      (curDir == 0 && World.isFree(x + 1, y)) { x += 1; moveAnimation(spritesRight); }
+        else if (curDir == 1 && World.isFree(x - 1, y)) { x -= 1; moveAnimation(spritesLeft); }
+        else if (curDir == 2 && World.isFree(x, y - 1)) { y -= 1; moveAnimation(spritesBack); }
+        else if (curDir == 3 && World.isFree(x, y + 1)) { y += 1; moveAnimation(spritesFront); }
 
         this.setBounds(x, y, 16, 16);
     }
@@ -199,25 +211,33 @@ public class Pharaoh extends Rectangle {
         powerAttacking = true;
         powerFrames = 0;
         orbShotCount = 0;
-        orbShotDelay = ORB_SHOT_INTERVAL; // dispara imediatamente o primeiro
+        orbShotDelay = ORB_SHOT_INTERVAL;
     }
 
     private void shootOrbs() {
         int cx = x + 8, cy = y + 8;
-        orbs.add(new Orb(cx, cy,  1,  0)); // direita
-        orbs.add(new Orb(cx, cy, -1,  0)); // esquerda
-        orbs.add(new Orb(cx, cy,  0,  1)); // baixo
-        orbs.add(new Orb(cx, cy,  0, -1)); // cima
+        orbs.add(new Orb(cx, cy,  1,  0));
+        orbs.add(new Orb(cx, cy, -1,  0));
+        orbs.add(new Orb(cx, cy,  0,  1));
+        orbs.add(new Orb(cx, cy,  0, -1));
     }
 
     public void takeDamage(int damage, int playerDir) {
         vida -= damage;
+        if (vida <= 0) {
+            vida = 0;
+            dead = true;
+        }
         switch (playerDir) {
             case 0 -> knockbackY =  8;
             case 1 -> knockbackY = -8;
             case 2 -> knockbackX =  8;
             case 3 -> knockbackX = -8;
         }
+    }
+
+    public boolean isDeathAnimationDone() {
+        return dead && deathFrames >= DEATH_DURATION;
     }
 
     private void moveAnimation(BufferedImage[] sprites) {
@@ -230,11 +250,11 @@ public class Pharaoh extends Rectangle {
     }
 
     public void render(Graphics g) {
-        // renderiza orbes
         for (Orb orb : orbs) orb.render(g);
-
-        // renderiza pharaoh
-        if (powerAttacking) {
+        if (dead) {
+            if (deathSprite != null)
+                g.drawImage(deathSprite, x - Camera.x, y - Camera.y, null);
+        } else if (powerAttacking) {
             g.drawImage(powerSprite, x - Camera.x, y - Camera.y, null);
         } else if (normalAttacking && curNormalAttackSprite != null) {
             g.drawImage(curNormalAttackSprite, x - Camera.x, y - Camera.y, null);
