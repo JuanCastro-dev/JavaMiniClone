@@ -44,19 +44,26 @@ public class Pharaoh extends Rectangle {
 
     private boolean normalAttacking = false;
     private int normalAttackFrames = 0;
-    private static final int NORMAL_ATTACK_DURATION = 120; // 2 segundos a 60fps
+    private static final int NORMAL_ATTACK_DURATION = 120;
     private static final int ATTACK_RANGE = 20;
-    private static final int ATTACK_COOLDOWN = 180; // dobrado
+    private static final int ATTACK_COOLDOWN = 180;
     private int attackCooldownFrames = 0;
+    private boolean normalAttackPending = false;
+    private int normalAttackDelayFrames = 0;
+    private static final int NORMAL_ATTACK_DELAY = 15; // 0.25s
+    private int pendingPx, pendingPy;
     private BufferedImage curNormalAttackSprite;
-    private BufferedImage[] curNormalAttackAnim; // sprites da animação de ataque (pode ter 1 ou 2 frames)
+    private BufferedImage[] curNormalAttackAnim;
 
     private boolean powerAttacking = false;
     private int powerFrames = 0;
-    private static final int POWER_DURATION = 40; // dobrado
+    private static final int POWER_DURATION = 40;
     private int orbShotCount = 0;
     private int orbShotDelay = 0;
     private static final int ORB_SHOT_INTERVAL = 60;
+    private static final int POWER_DELAY = 45; // 0.75s
+    private boolean powerPending = false;
+    private int powerDelayFrames = 0;
 
     public boolean dead = false;
     private int deathFrames = 0;
@@ -66,7 +73,7 @@ public class Pharaoh extends Rectangle {
     public ArrayList<Orb> orbs = new ArrayList<>();
 
     public Pharaoh(int x, int y) {
-        super(x, y, 16, 16);
+        super(x, y, 18, 18);
         curDirection = spritesFront;
 
         try {
@@ -128,11 +135,34 @@ public class Pharaoh extends Rectangle {
             return;
         }
 
+        // delay ataque normal
+        if (normalAttackPending) {
+            normalAttackDelayFrames++;
+            if (normalAttackDelayFrames >= NORMAL_ATTACK_DELAY) {
+                normalAttackPending = false;
+                normalAttackDelayFrames = 0;
+                triggerNormalAttack(pendingPx, pendingPy);
+            }
+            return;
+        }
+
+        // delay poder especial
+        if (powerPending) {
+            powerDelayFrames++;
+            if (powerDelayFrames >= POWER_DELAY) {
+                powerPending = false;
+                powerDelayFrames = 0;
+                triggerPower();
+            }
+            return;
+        }
+
         // poder especial
         int threshold = (vida / 50) * 50;
-        if (threshold < lastPowerThreshold && !powerAttacking) {
+        if (threshold < lastPowerThreshold && !powerAttacking && !powerPending) {
             lastPowerThreshold = threshold;
-            triggerPower();
+            powerPending = true;
+            powerDelayFrames = 0;
         }
 
         if (powerAttacking) {
@@ -170,7 +200,11 @@ public class Pharaoh extends Rectangle {
         int px = Game.player.x, py = Game.player.y;
         int dist = (int) Math.sqrt(Math.pow(px - x, 2) + Math.pow(py - y, 2));
         if (dist <= ATTACK_RANGE && attackCooldownFrames >= ATTACK_COOLDOWN) {
-            triggerNormalAttack(px, py);
+            normalAttackPending = true;
+            normalAttackDelayFrames = 0;
+            pendingPx = px;
+            pendingPy = py;
+            attackCooldownFrames = 0;
             return;
         }
 

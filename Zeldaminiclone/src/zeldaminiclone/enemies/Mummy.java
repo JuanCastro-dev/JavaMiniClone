@@ -36,6 +36,9 @@ public class Mummy extends Rectangle {
     private boolean attacking = false;
     private int attackFrames = 0;
     private static final int ATTACK_DURATION = 20;
+    private boolean attackPending = false;
+    private int attackDelayFrames = 0;
+    private static final int ATTACK_DELAY = 15; // 0.25s
     private BufferedImage curAttackSprite;
 
     public Mummy(int x, int y) {
@@ -69,6 +72,16 @@ public class Mummy extends Rectangle {
     }
 
     public void tick() {
+        if (attackPending) {
+            attackDelayFrames++;
+            if (attackDelayFrames >= ATTACK_DELAY) {
+                attackPending = false;
+                attackDelayFrames = 0;
+                attacking = true;
+                attackFrames = 0;
+            }
+        }
+
         if (attacking) {
             attackFrames++;
             if (attackFrames >= ATTACK_DURATION) {
@@ -126,9 +139,9 @@ public class Mummy extends Rectangle {
     }
 
     private void triggerAttack() {
-        if (attacking) return;
-        attacking = true;
-        attackFrames = 0;
+        if (attacking || attackPending) return;
+        attackPending = true;
+        attackDelayFrames = 0;
         int px = Game.player.x, py = Game.player.y;
         int dx = px - x, dy = py - y;
         if (Math.abs(dx) >= Math.abs(dy)) {

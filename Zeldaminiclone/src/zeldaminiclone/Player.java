@@ -228,7 +228,7 @@ public class Player extends Rectangle {
             case 3 -> attackLeft;
             default -> attackDown;
         };
-        int reach = 5;
+        int reach = 6;
         Rectangle hitbox = switch (lastDir) {
             case 1 -> new Rectangle(x, y - reach, 16, 16 + reach);
             case 2 -> new Rectangle(x, y, 16 + reach, 16);
