@@ -44,11 +44,12 @@ public class Pharaoh extends Rectangle {
 
     private boolean normalAttacking = false;
     private int normalAttackFrames = 0;
-    private static final int NORMAL_ATTACK_DURATION = 60; // dobrado
+    private static final int NORMAL_ATTACK_DURATION = 120; // 2 segundos a 60fps
     private static final int ATTACK_RANGE = 20;
     private static final int ATTACK_COOLDOWN = 180; // dobrado
     private int attackCooldownFrames = 0;
     private BufferedImage curNormalAttackSprite;
+    private BufferedImage[] curNormalAttackAnim; // sprites da animação de ataque (pode ter 1 ou 2 frames)
 
     private boolean powerAttacking = false;
     private int powerFrames = 0;
@@ -98,10 +99,11 @@ public class Pharaoh extends Rectangle {
             if (!droppedItem) {
                 droppedItem = true;
                 try {
-                    BufferedImage staffSprite = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-                    // sprite será nulo até o jogador adicionar o arquivo; item ainda é criado
+                    BufferedImage staffSprite = ImageIO.read(new File("resources/itens/staff.png"));
                     World.items.add(new Item(x, y, staffSprite, "staff"));
-                } catch (Exception ignored) {}
+                } catch (Exception e) {
+                    System.err.println("Erro ao carregar staff.png");
+                }
             }
             return;
         }
@@ -199,10 +201,11 @@ public class Pharaoh extends Rectangle {
         normalAttackFrames = 0;
         int dx = px - x, dy = py - y;
         if (Math.abs(dx) >= Math.abs(dy)) {
-            curNormalAttackSprite = dx >= 0 ? attackRight[0] : attackLeft[0];
+            curNormalAttackAnim = dx >= 0 ? attackRight : attackLeft;
         } else {
-            curNormalAttackSprite = dy >= 0 ? attackDown : attackUp;
+            curNormalAttackAnim = dy >= 0 ? new BufferedImage[]{attackDown} : new BufferedImage[]{attackUp};
         }
+        curNormalAttackSprite = curNormalAttackAnim[0];
         Game.player.vida -= 15;
         if (Game.player.vida <= 0) Game.gameOver();
     }
@@ -256,8 +259,9 @@ public class Pharaoh extends Rectangle {
                 g.drawImage(deathSprite, x - Camera.x, y - Camera.y, null);
         } else if (powerAttacking) {
             g.drawImage(powerSprite, x - Camera.x, y - Camera.y, null);
-        } else if (normalAttacking && curNormalAttackSprite != null) {
-            g.drawImage(curNormalAttackSprite, x - Camera.x, y - Camera.y, null);
+        } else if (normalAttacking && curNormalAttackAnim != null) {
+            int frameIndex = normalAttackFrames < NORMAL_ATTACK_DURATION / 2 ? 0 : Math.min(1, curNormalAttackAnim.length - 1);
+            g.drawImage(curNormalAttackAnim[frameIndex], x - Camera.x, y - Camera.y, null);
         } else {
             g.drawImage(curDirection[curAnimation], x - Camera.x, y - Camera.y, null);
         }

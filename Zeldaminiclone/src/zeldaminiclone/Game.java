@@ -93,9 +93,14 @@ public class Game extends Canvas implements Runnable, KeyListener {
                     World.pharaohs.remove(i);
                 }
             }
-            nearExit = World.exitX >= 0 &&
-                Math.abs(player.x - World.exitX) < 16 &&
-                Math.abs(player.y - World.exitY) < 16;
+            nearExit = false;
+            Rectangle playerRect = new Rectangle(player.x, player.y, 16, 16);
+            for (Rectangle tile : World.exitTiles) {
+                if (playerRect.intersects(tile)) {
+                    nearExit = true;
+                    break;
+                }
+            }
         }
         if (gameState.equals("GAME_OVER")) {
             fadeFrames++;
@@ -271,6 +276,11 @@ public class Game extends Canvas implements Runnable, KeyListener {
         g.drawString("Pontos: " + Player.score, 10, 35);
         g.drawString("Recorde: " + Player.highScore, 10, 45);
 
+        // Aviso de saída no canto superior
+        if (nearExit && World.pressEImage != null) {
+            g.drawImage(World.pressEImage, WIDTH - 26, 6, 16, 16, null);
+        }
+
         // Inventário
         int slotSize = 18;
         int padding = 2;
@@ -331,6 +341,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
         World.pharaohs.clear();
         World.exitX = -1;
         World.exitY = -1;
+        World.exitTiles.clear();
         world = new World(levelPath);
     }
 

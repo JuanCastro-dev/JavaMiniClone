@@ -23,8 +23,9 @@ public class World {
     public static int WIDTH, HEIGHT;
 
     private static BufferedImage background;
-    private static BufferedImage pressEImage;
+    public static BufferedImage pressEImage;
     public static int exitX = -1, exitY = -1;
+    public static ArrayList<Rectangle> exitTiles = new ArrayList<>();
 
     public World(String path) {
         try {
@@ -82,6 +83,7 @@ public class World {
                     else if (red == 255 && green == 255 && blue == 0) {
                         exitX = x * 16;
                         exitY = y * 16;
+                        exitTiles.add(new Rectangle(x * 16, y * 16, 16, 16));
                     } else {
                         System.out.println("Pixel desconhecido em (" + x + "," + y + "): R=" + red + " G=" + green + " B=" + blue);
                     }
@@ -109,8 +111,9 @@ public class World {
     }
 
     public void renderExit(Graphics g) {
-        if (exitX >= 0 && Game.nearExit && pressEImage != null) {
-            g.drawImage(pressEImage, exitX - Camera.x, exitY - Camera.y, null);
+        if (exitTiles.isEmpty() || pressEImage == null) return;
+        for (Rectangle tile : exitTiles) {
+            g.drawImage(pressEImage, tile.x - Camera.x, tile.y - Camera.y, 16, 16, null);
         }
     }
 
