@@ -225,6 +225,14 @@ public class Game extends Canvas implements Runnable, KeyListener {
         }
     }
 
+    private String getMusicPath(int level) {
+        return switch (level) {
+            case 4 -> "resources/sounds/boss_sound.wav";
+            case 3 -> "resources/sounds/music_2.wav";
+            default -> "resources/sounds/music_" + level + ".wav";
+        };
+    }
+
     public void trocarFase() {
         if (!nearExit || fadeOut || pendingLevelChange) return;
         nearExit = false;
@@ -315,7 +323,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
                 if (pendingLevelChange) {
                     pendingLevelChange = false;
                     music.stop();
-                    music = new Sounds("resources/sounds/music_" + currentLevel + ".wav");
+                    music = new Sounds(getMusicPath(currentLevel));
                     music.loop();
                     restartGame("resources/map/map_" + currentLevel + ".png");
                 }
