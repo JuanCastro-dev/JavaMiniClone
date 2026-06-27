@@ -37,7 +37,7 @@ public class Pharaoh extends Rectangle {
     // delay de movimento para reduzir velocidade pela metade
     private int moveDelay = 0;
 
-    public int vida = 300;
+    public int vida = 350;
     private int lastPowerThreshold = 300;
 
     private float knockbackX = 0, knockbackY = 0;

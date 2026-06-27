@@ -284,6 +284,31 @@ public class Game extends Canvas implements Runnable, KeyListener {
         g.drawString("Pontos: " + Player.score, 10, 35);
         g.drawString("Recorde: " + Player.highScore, 10, 45);
 
+        // Barra de vida do Faraó (apenas no map_4)
+        if (currentLevel == 4 && !World.pharaohs.isEmpty()) {
+            zeldaminiclone.enemies.Pharaoh pharaoh = World.pharaohs.get(0);
+            int barWidth = 80;
+            int barHeight = 4;
+            int barX = (WIDTH - barWidth) / 2;
+            int barY = HEIGHT - 12;
+
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Arial", Font.BOLD, 6));
+            String nome = "Faraó";
+            int nomeWidth = g.getFontMetrics().stringWidth(nome);
+            g.drawString(nome, (WIDTH - nomeWidth) / 2, barY - 2);
+
+            g.setColor(Color.RED);
+            g.fillRect(barX, barY, barWidth, barHeight);
+
+            int vidaFarao = pharaoh.vida * barWidth / 300;
+            g.setColor(vidaFarao < barWidth / 3 ? Color.ORANGE : Color.GREEN);
+            g.fillRect(barX, barY, vidaFarao, barHeight);
+
+            g.setColor(Color.WHITE);
+            g.drawRect(barX, barY, barWidth, barHeight);
+        }
+
         // Aviso de saída no canto superior
         if (nearExit && World.pressEImage != null) {
             g.drawImage(World.pressEImage, WIDTH - 26, 6, 16, 16, null);
