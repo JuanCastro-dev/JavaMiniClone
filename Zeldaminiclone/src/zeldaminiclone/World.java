@@ -1,6 +1,8 @@
 package zeldaminiclone;
 
 import zeldaminiclone.blocks.DirtBlock;
+import zeldaminiclone.blocks.PyramidWall;
+import zeldaminiclone.blocks.PyramidTorch;
 import zeldaminiclone.enemies.Mummy;
 import zeldaminiclone.enemies.Pharaoh;
 
@@ -16,6 +18,8 @@ public class World {
 
     public static ArrayList<Blocks> blocks = new ArrayList<>();
     public static ArrayList<DirtBlock> dirtBlocks = new ArrayList<>();
+    public static ArrayList<PyramidWall> pyramidWalls = new ArrayList<>();
+    public static ArrayList<PyramidTorch> pyramidTorches = new ArrayList<>();
     public static ArrayList<Item> items = new ArrayList<>();
     public static ArrayList<Enemy> enemies = new ArrayList<>();
     public static ArrayList<Mummy> mummies = new ArrayList<>();
@@ -29,7 +33,9 @@ public class World {
 
     public World(String path) {
         try {
-            String bgPath = path.contains("map_2") || path.contains("map_3") ? "resources/map/dirt_floor.png" : "resources/map/map_grass.png";
+            String bgPath = path.contains("map_2") || path.contains("map_3") ? "resources/map/dirt_floor.png" :
+                           path.contains("map_4") ? "resources/map/piramid/pyramid_floor.png" :
+                           "resources/map/map_grass.png";
             background = ImageIO.read(new File(bgPath));
 
             if (pressEImage == null) {
@@ -80,6 +86,12 @@ public class World {
                     else if (red == 137 && green == 81 && blue == 41) {
                         dirtBlocks.add(new DirtBlock(x * 16, y * 16));
                     }
+                    else if (red == 177 && green == 146 && blue == 146) {
+                        pyramidWalls.add(new PyramidWall(x * 16, y * 16));
+                    }
+                    else if (red == 42 && green == 35 && blue == 18) {
+                        pyramidTorches.add(new PyramidTorch(x * 16, y * 16));
+                    }
                     else if (red == 255 && green == 255 && blue == 0) {
                         exitX = x * 16;
                         exitY = y * 16;
@@ -101,6 +113,12 @@ public class World {
         }
         for (int i = 0; i < dirtBlocks.size(); i++) {
             dirtBlocks.get(i).render(g);
+        }
+        for (int i = 0; i < pyramidWalls.size(); i++) {
+            pyramidWalls.get(i).render(g);
+        }
+        for (int i = 0; i < pyramidTorches.size(); i++) {
+            pyramidTorches.get(i).render(g);
         }
     }
 
@@ -127,9 +145,15 @@ public class World {
         }
         for (int i = 0; i < dirtBlocks.size(); i++) {
             DirtBlock bloco = dirtBlocks.get(i);
-            if (futurePlayer.intersects(bloco)) {
-                return false;
-            }
+            if (futurePlayer.intersects(bloco)) return false;
+        }
+        for (int i = 0; i < pyramidWalls.size(); i++) {
+            PyramidWall bloco = pyramidWalls.get(i);
+            if (futurePlayer.intersects(bloco)) return false;
+        }
+        for (int i = 0; i < pyramidTorches.size(); i++) {
+            PyramidTorch bloco = pyramidTorches.get(i);
+            if (futurePlayer.intersects(bloco)) return false;
         }
         return true;
     }

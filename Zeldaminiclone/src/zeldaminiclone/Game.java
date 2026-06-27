@@ -343,6 +343,8 @@ public class Game extends Canvas implements Runnable, KeyListener {
     public void restartGame(String levelPath) {
         World.blocks.clear();
         World.dirtBlocks.clear();
+        World.pyramidWalls.clear();
+        World.pyramidTorches.clear();
         World.items.clear();
         World.enemies.clear();
         World.mummies.clear();
