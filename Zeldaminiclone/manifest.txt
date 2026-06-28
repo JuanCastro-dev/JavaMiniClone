@@ -1,0 +1,2 @@
+Main-Class: zeldaminiclone.Zeldaminiclone
+Class-Path: .
